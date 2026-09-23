@@ -396,7 +396,7 @@ const HUBTITLE={home:'Карьерный щит',compass:'Компас проф�
 
 function renderPhone(){
   let html;
-  if(S.screen==='input') html=topbar('СберБанк Онлайн',false)+'<div class="scroll" id="scroll">'+vInput()+'</div>';
+  if(S.screen==='input') html='<div class="scroll" id="scroll" style="padding-top:18px">'+vInput()+'</div>';
   else if(S.screen==='result') html=topbar('Риск замены',true)+'<div class="scroll" id="scroll">'+vResult()+'</div>';
   else { const V={home:vHome,compass:vCompass,save:vSave,learn:vLearn,job:vJob}; html=topbar(HUBTITLE[S.tab],true)+'<div class="scroll" id="scroll">'+V[S.tab]()+'</div>'+tabsHtml(); }
   html+=pushHtml();
