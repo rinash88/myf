@@ -48,6 +48,18 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .score .big{font-size:78px;font-weight:800;line-height:1;margin-top:4px;font-variant-numeric:tabular-nums}
 .pills{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
 .pill{font-size:13px;font-weight:700;padding:7px 12px;border-radius:14px}
+.gauge{position:relative;display:flex;flex-direction:column;align-items:center;margin-top:6px}
+.gauge .big{margin-top:-4px;font-size:66px}
+.scan{font-size:13px;color:#7EDB9C;min-height:18px;letter-spacing:.02em}
+.pills.pre{opacity:0;transform:translateY(8px)}
+.pills{transition:opacity .5s ease,transform .5s ease}
+.bars.grow i{transform-origin:bottom;animation:growY .6s cubic-bezier(.2,.8,.2,1) both}
+.bars.grow em{animation:fadeIn .4s ease both}
+@keyframes growY{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+.big.pop{animation:pulse .45s ease}
+@media (prefers-reduced-motion:reduce){.bars.grow i,.bars.grow em{animation:none}.big.pop{animation:none}}
 .bars{display:flex;align-items:flex-end;gap:6px;height:124px}
 .bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:124px;font-variant-numeric:tabular-nums}
 .bar i{display:block;width:100%;border-radius:4px 4px 0 0}
@@ -265,7 +277,7 @@ function match(q){const n=norm(q);if(n.length<2)return[];return Object.keys(O).f
 function risk(o,bump){const e=Math.min(0.95,o.e+(bump||0));const mid=1.5+(1-e)*9/o.s;const pmax=Math.min(0.95,0.35+e*0.65);const floor=e*0.35;const P=t=>floor+(pmax-floor)/(1+Math.exp(-0.65*(t-mid)));let t50=99;for(let t=0;t<=30;t+=0.1){if(P(t)>=0.5){t50=Math.max(0.5,t);break;}}const bars=[];for(let y=2027;y<=2036;y++){const p=Math.round(P(y-2026)*100);bars.push({y:String(y).slice(2),p,h:Math.max(3,Math.round(p*0.98))});}return{t50,p2031:Math.round(P(5)*100),p2036:Math.round(P(10)*100),bars};}
 const tierOf=r=>r.p2036>=65?'high':(r.p2036>=30?'mid':'low');
 
-function initial(){return{screen:'input',tab:'home',query:'',occ:null,notFound:false,bump:0,shared:false,
+function initial(){return{anim:false,screen:'input',tab:'home',query:'',occ:null,notFound:false,bump:0,shared:false,
   target:null, compassFilter:'fit',
   save:{on:false,pct:8,roundup:false,balance:0,insurance:false},
   learn:{started:false,done:0,streak:0},
@@ -351,21 +363,21 @@ function vResult(){
   const when=r.t50>20?'более 20 лет':('через ~'+years+' '+plural(years,'год','года','лет')+' ('+(2026+years)+')');
   const tierLabel=tier==='high'?'Высокий риск':(tier==='mid'?'Средний риск':'Низкий риск');
   const tierBg=tier==='high'?'var(--redSoft)':(tier==='mid'?'var(--amberSoft)':'var(--greenSoft)');
-  const scoreC=tier==='high'?'#FF8A80':(tier==='mid'?'#FFC46B':'#7EDB9C');
+  const scoreC=hueCol(r.p2036);
   const verdict=o.special?(o.key==='jobless'?'ИИ нечего у вас забрать — а вот помочь он может. Подберём профессию, где риск замены низкий, дадим короткое обучение в рассрочку и найдём работу. Копилка поможет продержаться, пока ищете.':'Хорошая новость: вы выбираете профессию сейчас, когда уже видно, какие работы заберёт ИИ. Компас покажет, куда идти, чтобы через 10 лет быть востребованным.'):(o.custom?'Точной профессии нет в базе — оценили по похожим задачам. ':'')+(tier==='high'?'ИИ уже уверенно делает «'+top.name+'» — около '+top.w+'% этой части работы. Профессию не отменят за один день, но людей в ней будут сокращать раньше: переходить лучше заранее, пока есть доход.'
    :(tier==='mid'?'ИИ заберёт рутину — «'+top.name+'», но «'+human.name+'» останется за человеком. Кто освоит ИИ-инструменты, станет ценнее; кто нет — будет конкурировать с ИИ по цене.'
    :'Работа руками и с людьми: ИИ здесь помощник, а не замена. «'+human.name+'» останется за вами надолго. Рутину вроде «'+top.name+'» можно отдать ИИ уже сейчас.'));
   const others=POPULAR.filter(k=>k!==o.key).slice(0,6);
   const sc0=Math.round(20*(1-r.p2036/100));
   return '<div class="score"><span style="color:#C9CED2;font-size:13px">Риск замены ИИ для профессии</span><strong style="font-size:20px">'+esc(o.name)+'</strong>'+
-   '<div class="big" style="color:'+scoreC+'">'+r.p2036+'%</div><span style="color:#D0D5D9;font-size:14px">вероятность, что ИИ заберёт бо́льшую часть работы в ближайшие 10 лет</span><span style="color:#9AA1A7;font-size:13px">к 2031 — '+r.p2031+'%</span>'+
-   '<div class="pills"><span class="pill" style="background:'+tierBg+';color:'+riskCol(r.p2036)+'">'+tierLabel+'</span><span class="pill" style="background:var(--dark2);color:#fff">Точка 50%: '+when+'</span></div></div>'+
+   '<div class="gauge" id="gauge" data-target="'+r.p2036+'"><svg viewBox="0 0 200 116" width="230" height="134" aria-hidden="true"><defs><linearGradient id="gg" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#3FBF6A"/><stop offset=".5" stop-color="#F2B233"/><stop offset="1" stop-color="#F0584C"/></linearGradient></defs><path d="M16 100 A84 84 0 0 1 184 100" fill="none" stroke="#2E3338" stroke-width="16" stroke-linecap="round"/><path id="garc" d="M16 100 A84 84 0 0 1 184 100" fill="none" stroke="url(#gg)" stroke-width="16" stroke-linecap="round" pathLength="100" stroke-dasharray="'+(S.anim?0:r.p2036)+' 100"/><line id="gneedle" x1="100" y1="100" x2="100" y2="30" stroke="#fff" stroke-width="4" stroke-linecap="round" transform="rotate('+(S.anim?-90:(-90+r.p2036*1.8))+' 100 100)"/><circle cx="100" cy="100" r="8" fill="#fff"/></svg><div class="big" id="bigNum" style="color:'+(S.anim?'#3FBF6A':scoreC)+'">'+(S.anim?0:r.p2036)+'%</div></div><span class="scan" id="scanTxt">'+(S.anim?'Анализируем задачи профессии…':'')+'</span><span style="color:#D0D5D9;font-size:14px">вероятность, что ИИ заберёт бо́льшую часть работы в ближайшие 10 лет</span><span style="color:#9AA1A7;font-size:13px">к 2031 — '+r.p2031+'%</span>'+
+   '<div class="pills'+(S.anim?' pre':'')+'" id="pills"><span class="pill" style="background:'+tierBg+';color:'+riskCol(r.p2036)+'">'+tierLabel+'</span><span class="pill" style="background:var(--dark2);color:#fff">Точка 50%: '+when+'</span></div></div>'+
   '<div class="card"><span class="eyebrow" style="color:'+riskCol(r.p2036)+'">Вердикт</span><div>'+esc(verdict)+'</div></div>'+
   '<div class="next" style="background:var(--dark)"><span style="font-size:13px;color:#B8BFC4">Ваша защищённость сейчас</span><div class="row"><strong style="font-size:28px">'+sc0+'/100</strong><span class="pill" style="background:#3A1F1D;color:#FF8A80">Уязвим</span></div><div class="track" style="background:#2E3338"><i style="width:'+sc0+'%;background:#FF8A80"></i></div><span style="font-size:14px;color:#D0D5D9">Поднимите её до 80+ за 4 шага. Каждый шаг — реальное действие в Сбере.</span></div>'+
   '<div class="grid2">'+
    [['compass','Компас','Куда перейти с вашим опытом'],['save','Копилка','Подушка на время перехода'],['learn','Обучение','Курс с оплатой частями'],['job','Работа','Резюме, отклики, оффер']].map(x=>'<button class="tile" data-act="toHubTab" data-arg="'+x[0]+'">'+svg(x[0],'#137A3F')+'<span class="t">'+x[1]+'</span><span class="hint">'+x[2]+'</span></button>').join('')+'</div>'+
   '<button class="btn" data-act="toHub" style="height:56px">Защитить свой доход</button>'+
-  '<div class="card"><strong>Вероятность по годам</strong><div class="bars">'+r.bars.map(b=>'<div class="bar"><em>'+b.p+'</em><i style="height:'+b.h+'px;background:'+riskCol(b.p)+'"></i><small>'+b.y+'</small></div>').join('')+'</div></div>'+
+  '<div class="card"><strong>Вероятность по годам</strong><div class="bars'+(S.anim?' grow':'')+'">'+r.bars.map((b,i)=>'<div class="bar"><em style="animation-delay:'+(1.6+i*0.08)+'s">'+b.p+'</em><i style="height:'+b.h+'px;background:'+riskCol(b.p)+';animation-delay:'+(1.5+i*0.08)+'s"></i><small>'+b.y+'</small></div>').join('')+'</div></div>'+
   (o.special?'':'<div class="card"><strong>Что уйдёт к ИИ первым</strong>'+byW.map(t=>'<div style="display:flex;flex-direction:column;gap:6px"><div class="row" style="font-size:14px"><span>'+esc(t.name)+'</span><b style="color:'+riskCol(t.w)+'">'+t.w+'%</b></div><div class="track"><i style="width:'+t.w+'%;background:'+riskCol(t.w)+'"></i></div></div>').join('')+'</div>')+
   '<button class="btn ghost" data-act="share">Поделиться результатом</button>'+(S.shared?'<p class="hint" style="text-align:center;color:var(--green)">Ссылка скопирована. Друг проверит свою профессию — в Сбере.</p>':'')+
   '<div class="card"><strong>А как у близких?</strong><div class="chips">'+others.map(k=>{const p=risk(O[k],0).p2036;return'<button class="chip" data-act="pick" data-arg="'+k+'">'+esc(O[k].name)+' · <b style="color:'+riskCol(p)+'">'+p+'%</b></button>';}).join('')+'</div></div>'+
@@ -513,7 +525,25 @@ function goScreen(sc,tab){S.screen=sc;if(tab)S.tab=tab;S.push=null;render(sc==='
 
 function openResult(k){S.occ=k;if(k!=='custom')S.query=O[k].name;S.target=null;S.bump=0;S.notFound=false;S.shared=false;
   S.save={on:false,pct:8,roundup:false,balance:0,insurance:false};S.learn={started:false,done:0,streak:0};S.job={resume:false,applied:[],invited:false,prepared:false,offer:false,salaryMoved:false};S.agent=[];
-  addLog('Проверка','«'+O[k].name+'»: риск за 10 лет '+risk(O[k],0).p2036+'%');goScreen('result');}
+  addLog('Проверка','«'+O[k].name+'»: риск за 10 лет '+risk(O[k],0).p2036+'%');S.anim=true;goScreen('result');runReveal();}
+function hueCol(v){const h=140-135*Math.min(1,v/100);return 'hsl('+h+',78%,64%)';}
+function runReveal(){
+  const r=risk(occ(),S.bump),target=r.p2036,scores=['Анализируем задачи профессии…','Сравниваем с возможностями ИИ…','Считаем по годам…'];
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const num=document.getElementById('bigNum'),arc=document.getElementById('garc'),nd=document.getElementById('gneedle'),sc=document.getElementById('scanTxt'),pl=document.getElementById('pills');
+  const finish=()=>{S.anim=false;if(num){num.textContent=target+'%';num.style.color=hueCol(target);num.classList.add('pop');}if(arc)arc.setAttribute('stroke-dasharray',target+' 100');if(nd)nd.setAttribute('transform','rotate('+(-90+target*1.8)+' 100 100)');if(sc)sc.textContent='';if(pl)pl.classList.remove('pre');};
+  if(reduce||!num){finish();return;}
+  let si=0;const tick=setInterval(()=>{si++;if(sc&&si<scores.length)sc.textContent=scores[si];},420);
+  const dur=1500,t0=performance.now();
+  const step=now=>{if(!document.getElementById('bigNum')){clearInterval(tick);S.anim=false;return;}
+    const k=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-k,3);
+    const jitter=k<0.85?(Math.sin(now/40)*3*(1-k)):0;
+    const v=Math.max(0,Math.min(100,target*e+jitter));
+    num.textContent=Math.round(v)+'%';num.style.color=hueCol(v);
+    arc.setAttribute('stroke-dasharray',v.toFixed(1)+' 100');nd.setAttribute('transform','rotate('+(-90+v*1.8)+' 100 100)');
+    if(k<1)requestAnimationFrame(step);else{clearInterval(tick);finish();}};
+  requestAnimationFrame(step);
+}
 function doCalc(){if(norm(S.query).length<2){S.notFound=true;const nf0=document.getElementById('nf');if(nf0)nf0.hidden=false;return;}const m=match(S.query);if(m.length===1)return openResult(m[0]);if(m.length>1){const ex=m.find(k=>norm(O[k].name)===norm(S.query));if(ex)return openResult(ex);const n=norm(S.query);const sc=k=>Math.max(norm(O[k].name)===n?2000:0,...O[k].kw.map(w=>{const nw=norm(w);return nw===n?1000:(n.indexOf(nw)>=0?nw.length:0);}));const best=m.slice().sort((a,b)=>sc(b)-sc(a))[0];return openResult(best);}return openResult(makeCustom(S.query));
   const nf=document.getElementById('nf');if(nf)nf.hidden=!S.notFound;const sg=document.getElementById('sugg');if(sg)sg.innerHTML=suggestHtml();}
 
