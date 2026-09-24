@@ -489,7 +489,8 @@ const TRIG=[
  ['market','Раз в месяц','Новые вакансии','Рынок целевой профессии в его городе.'],
  ['risk','Раз в квартал','Пересчёт риска','Модель обновилась — риск и срок сдвинулись.']
 ];
-function renderPanel(){
+const isDemo=()=>location.hash==='#demo';
+function renderPanel(){const pn=document.getElementById('panel');pn.hidden=!isDemo();if(!isDemo())return;
   const s=score(); const price=S.learn.started?coursePrice():0;
   document.getElementById('panel').innerHTML=
    '<span class="eyebrow" style="letter-spacing:.08em">Прототип · Доход, устойчивый к ИИ</span><h2>Почему клиент не уходит</h2>'+
@@ -562,6 +563,7 @@ function agentAct(id,status){mutate(()=>{const a=S.agent.find(x=>x.id===id);if(!
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||el.disabled)return;const f=ACT[el.dataset.act];if(f)f(el.dataset.arg);});
 document.addEventListener('input',e=>{if(e.target.id!=='prof-input')return;S.query=e.target.value;S.notFound=false;const nf=document.getElementById('nf');if(nf)nf.hidden=true;const sg=document.getElementById('sugg');if(sg)sg.innerHTML=suggestHtml();});
 document.addEventListener('keydown',e=>{if(e.target.id==='prof-input'&&e.key==='Enter'){e.preventDefault();doCalc();}});
+window.addEventListener('hashchange',()=>render(false));
 render(true);
 })();
 </script>
