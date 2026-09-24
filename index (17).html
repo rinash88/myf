@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Заменит ли ИИ вашу работу?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --ground:#E6EAE4; --app:#F3F5F1; --card:#FFFFFF; --ink:#14171A; --ink2:#3E454B; --muted:#5A6167;
+  --line:#D6DBD4; --green:#137A3F; --green2:#1E9E47; --greenSoft:#E3F3E8; --dark:#15191C; --dark2:#262B30;
+  --red:#B3261E; --redSoft:#FCE7E4; --amber:#8A5000; --amberSoft:#FFF1D9; --blue:#1F5FA8; --blueSoft:#E6EFFA;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.45 'Onest',system-ui,-apple-system,'Segoe UI',sans-serif}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,input:focus-visible{outline:3px solid #7FC99A;outline-offset:2px}
+button:disabled{opacity:.45;cursor:not-allowed}
+.wrap{display:flex;gap:44px;align-items:flex-start;justify-content:center;padding-block:28px;padding-inline:24px;min-height:100%}
+.phone{position:relative;width:390px;height:844px;flex-shrink:0;border-radius:48px;border:10px solid var(--dark);background:var(--app);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 60px -30px rgba(20,23,26,.45)}
+.top{height:60px;flex-shrink:0;padding:14px 16px 0;display:flex;align-items:center;gap:10px}
+.top h1{font-size:17px;font-weight:700;margin:0;flex:1}
+.iconbtn{width:44px;height:44px;border-radius:22px;border:0;background:var(--card);display:flex;align-items:center;justify-content:center;padding:0}
+.scroll{flex:1;overflow-y:auto;padding:6px 14px 24px;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--card);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;border:0;text-align:left}
+.card.tap:hover{box-shadow:0 0 0 2px var(--green) inset}
+.hero{background:var(--dark);color:#fff;border-radius:24px;padding:24px 20px;display:flex;flex-direction:column;gap:14px}
+.hero h2{font-size:30px;line-height:1.1;margin:0;font-weight:800;text-wrap:balance}
+.hero p{margin:0;color:#D0D5D9}
+.field{height:58px;border-radius:16px;border:2px solid var(--green2);background:#fff;padding:0 16px;font-size:18px;color:var(--ink);width:100%}
+.btn{height:52px;border-radius:26px;border:0;background:var(--green);color:#fff;font-size:16px;font-weight:700;padding:0 20px;width:100%}
+.btn.bright{background:var(--green2)}
+.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line);font-weight:600}
+.btn.outline{background:var(--card);color:var(--green);border:2px solid var(--green)}
+.btn.sm{height:44px;width:auto;font-size:14px;padding:0 16px}
+.btn.white{background:#fff;color:var(--green)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{height:44px;padding:0 14px;border-radius:22px;border:1px solid var(--line);background:var(--card);font-size:14px;font-weight:500}
+.chip.on{background:var(--dark);color:#fff;border-color:var(--dark)}
+.hint{font-size:13px;color:var(--muted);margin:0}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green)}
+.h3{font-size:17px;font-weight:800;margin:0}
+.score{background:var(--dark);color:#fff;border-radius:24px;padding:22px 18px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.score .big{font-size:78px;font-weight:800;line-height:1;margin-top:4px;font-variant-numeric:tabular-nums}
+.pills{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.pill{font-size:13px;font-weight:700;padding:7px 12px;border-radius:14px}
+.gauge{position:relative;display:flex;flex-direction:column;align-items:center;margin-top:6px}
+.gauge .big{margin-top:-4px;font-size:66px}
+.scan{font-size:13px;color:#7EDB9C;min-height:18px;letter-spacing:.02em}
+.pills.pre{opacity:0;transform:translateY(8px)}
+.pills{transition:opacity .5s ease,transform .5s ease}
+.bars.grow i{transform-origin:bottom;animation:growY .6s cubic-bezier(.2,.8,.2,1) both}
+.bars.grow em{animation:fadeIn .4s ease both}
+@keyframes growY{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+.big.pop{animation:pulse .45s ease}
+@media (prefers-reduced-motion:reduce){.bars.grow i,.bars.grow em{animation:none}.big.pop{animation:none}}
+.bars{display:flex;align-items:flex-end;gap:6px;height:124px}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:124px;font-variant-numeric:tabular-nums}
+.bar i{display:block;width:100%;border-radius:4px 4px 0 0}
+.bar small{font-size:11px;color:var(--muted)}
+.bar em{font-style:normal;font-size:10px;font-weight:600;color:var(--ink2)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.track{height:8px;border-radius:4px;background:#E2E6E0;overflow:hidden}
+.track i{display:block;height:8px;transition:width .5s ease}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;font-weight:600;padding:5px 10px;border-radius:12px;background:#EDF0EB;white-space:nowrap}
+.tag.g{background:var(--greenSoft);color:#0E5C2F}
+.tag.r{background:var(--redSoft);color:var(--red)}
+.tag.a{background:var(--amberSoft);color:var(--amber)}
+.tag.b{background:var(--blueSoft);color:var(--blue)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--card);border:0;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:6px;text-align:left;min-height:108px}
+.tile:hover{box-shadow:0 0 0 2px var(--green) inset}
+.tile .t{font-weight:800;font-size:15px}
+.ring{width:108px;height:108px;border-radius:54px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .5s}
+.ring>div{width:84px;height:84px;border-radius:42px;background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.next{background:var(--green);color:#fff;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;border:0;text-align:left}
+.next:hover{background:#0F6A36}
+.item{display:flex;flex-direction:column;gap:8px;padding-bottom:12px;border-bottom:1px solid #ECEFEA}
+.item:last-child{border-bottom:0;padding-bottom:0}
+.lesson{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #ECEFEA}
+.lesson:last-child{border-bottom:0}
+.lesson .n{width:30px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+.toggle{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #ECEFEA}
+.toggle:last-child{border-bottom:0}
+.sw{width:52px;height:32px;border-radius:16px;border:0;background:#CDD3CB;position:relative;flex-shrink:0;padding:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:13px;background:#fff;transition:left .2s}
+.sw.on{background:var(--green2)}
+.sw.on::after{left:23px}
+.tabs{flex-shrink:0;display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border-top:1px solid #E3E7E1;padding:6px 4px 10px}
+.tabs button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--muted);padding:6px 0;position:relative}
+.tabs button.on{color:var(--green)}
+.tabs button .dotb{position:absolute;top:4px;right:calc(50% - 16px);width:8px;height:8px;border-radius:4px;background:var(--red)}
+.push{position:absolute;top:10px;left:10px;right:10px;background:#fff;border-radius:22px;padding:14px 16px;box-shadow:0 14px 34px rgba(20,23,26,.3);display:flex;flex-direction:column;gap:6px;animation:drop .35s ease-out;z-index:6}
+.toast{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);background:var(--dark);color:#fff;border-radius:18px;padding:10px 16px;font-size:14px;font-weight:700;white-space:nowrap;z-index:7;animation:pop .3s ease-out}
+.toast b{color:#7EDB9C}
+@keyframes drop{from{transform:translateY(-20px);opacity:.4}to{transform:none;opacity:1}}
+@keyframes pop{from{transform:translate(-50%,10px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+@media (prefers-reduced-motion:reduce){.push,.toast{animation:none}.track i,.sw::after,.ring{transition:none}}
+.push .app{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-weight:600}
+.push .app span:first-child{width:22px;height:22px;border-radius:6px;background:var(--green2)}
+.panel{flex:1;max-width:600px;display:flex;flex-direction:column;gap:14px;padding-top:4px}
+.panel h2{font-size:32px;line-height:1.1;margin:0;font-weight:800;text-wrap:balance}
+.panel p{margin:0;color:var(--ink2);max-width:60ch}
+.trig{text-align:left;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:3px}
+.trig:hover{border-color:var(--green)}
+.trig .f{font-size:12px;font-weight:700;color:var(--green)}
+.trig .l{font-size:15px;font-weight:700}
+.trig .w{font-size:12px;color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.kpi{background:var(--dark);color:#fff;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.kpi span{font-size:12px;color:#B8BFC4}
+.kpi b{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.log{display:flex;gap:10px;font-size:13px}
+.log b{color:var(--green);min-width:88px;white-space:nowrap}
+.warn{font-size:14px;color:#FFC46B;margin:0}
+@media (max-width:900px){
+  .wrap{flex-direction:column;align-items:stretch;padding-inline:0;padding-block:0;gap:20px}
+  .phone{width:100%;height:100vh;border:0;border-radius:0;box-shadow:none}
+  .panel{max-width:none;padding-inline:16px;padding-bottom:32px}
+  .panel h2{font-size:26px}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="phone" id="phone"></div>
+  <aside class="panel" id="panel"></aside>
+</div>
+
+<script>
+(function(){
+const OCC_RAW = [
+ ['buh','Бухгалтер','бухгалт,главбух,учет,учёт',0.78,1.2,'Первичные документы:90;Сверки и закрытие месяца:80;Налоговые расчёты:45;Консультирование руководства:15','finan:65,tax:70,aiacc:55',6,90000,95000,'↓'],
+ ['kass','Кассир','кассир',0.82,1.1,'Пробивка товаров:95;Приём оплаты:90;Консультация покупателей:35;Решение конфликтов:15','cx:60,logist:45,sales:50',3,30000,55000,'↓'],
+ ['call','Оператор колл-центра','колл,call,контакт-центр,контактный центр,оператор поддерж,поддержки',0.85,1.3,'Ответы на типовые вопросы:95;Маршрутизация обращений:85;Сложные конфликтные случаи:30;Удержание клиентов:25','cx:65,aitrain:55,sales:60',4,60000,60000,'↓'],
+ ['sekr','Секретарь, офис-менеджер','секретар,офис-менеджер,офис менеджер,ассистент руководит,делопроизвод',0.76,1.2,'Документооборот:90;Календари и встречи:85;Закупки для офиса:50;Координация команды:25','hr:55,pm:55,cx:60',4,50000,65000,'↓'],
+ ['copy','Копирайтер','копирайт,райтер,контент',0.8,1.4,'Типовые тексты:95;SEO-статьи:90;Идеи и концепции:35;Работа с заказчиком:20','market:60,prod:45,aitrain:55',5,70000,70000,'↓'],
+ ['perev','Переводчик','перевод',0.8,1.3,'Письменный перевод документов:90;Локализация:75;Устный синхрон:30;Сопровождение переговоров:20','teach:50,market:45,aitrain:55',6,80000,75000,'↓'],
+ ['dizg','Графический дизайнер','графическ,иллюстрат,дизайнер график,баннер',0.65,1.3,'Баннеры и типовые макеты:90;Ретушь:85;Концепция и арт-дирекшн:25;Работа с заказчиком:20','proddes:60,market:45,aitrain:40',5,70000,85000,'↓'],
+ ['jur','Юрист','юрист,юрисконсульт,адвокат',0.5,0.8,'Поиск судебной практики:85;Типовые договоры:80;Суды и переговоры:15;Стратегия защиты:15','compl:65,pm:45,tax:55',6,90000,120000,'→'],
+ ['prog','Программист','программист,разработчик,developer,кодер,1с',0.45,1.3,'Типовой код:80;Тесты и документация:75;Архитектура:25;Работа с бизнесом:20','ml:55,prod:45,pm:50',9,180000,190000,'→'],
+ ['qa','Тестировщик','тестировщ,qa',0.7,1.3,'Ручное тестирование:90;Тест-кейсы:80;Анализ сложных сбоев:35;Коммуникация с командой:20','prog:50,ml:40,prod:45',6,90000,120000,'↓'],
+ ['anal','Аналитик данных','аналитик данн,дата-аналит,data analyst,bi-аналит',0.42,1.2,'Выгрузки данных:85;Отчёты и дашборды:80;Постановка гипотез:25;Выводы для бизнеса:25','ml:60,prod:55,finan:50',6,110000,150000,'↑'],
+ ['market','Маркетолог','маркетолог,smm,таргетолог',0.5,1.1,'Тексты и креативы:85;Настройка кампаний:70;Исследования клиентов:30;Стратегия:25','prod:55,cx:55,pm:50',6,100000,120000,'→'],
+ ['hr','HR, рекрутер','hr,рекрутер,кадров,эйчар',0.6,1.1,'Скрининг резюме:90;Кадровые документы:85;Интервью:30;Развитие сотрудников:20','pm:50,cx:55,psy:40',5,70000,95000,'↓'],
+ ['sales','Менеджер по продажам','продаж,sales,менеджер по работе с клиент',0.35,0.9,'CRM и отчёты:80;Холодные письма:75;Переговоры:15;Ключевые клиенты:15','pm:50,prod:45,cx:55',3,50000,120000,'→'],
+ ['teach','Учитель','учител,преподават,педагог',0.25,0.6,'Проверка работ:80;Подготовка материалов:70;Работа с классом:10;Наставничество:10','psy:45,pm:40,aitrain:45',6,70000,70000,'→'],
+ ['doc','Врач','врач,доктор,терапевт,хирург,педиатр',0.2,0.5,'Оформление документации:80;Анализ снимков:60;Приём пациентов:10;Процедуры:5','teach:40,psy:35,pm:30',12,200000,150000,'↑'],
+ ['nurse','Медсестра','медсестр,медбрат,фельдшер',0.1,0.5,'Документация:70;Учёт препаратов:60;Процедуры:5;Уход за пациентами:5','teach:40,psy:35,cx:40',6,60000,65000,'↑'],
+ ['driver','Водитель','водител,таксист,дальнобой',0.35,0.6,'Маршрут и навигация:85;Вождение по трассе:40;Городское вождение:25;Работа с грузом и клиентом:15','logist:60,electr:40,sales:40',4,50000,90000,'→'],
+ ['kur','Курьер','курьер,доставщик',0.25,0.7,'Маршрутизация:85;Работа с возвратами:25;Доставка:20;Общение с клиентом:15','logist:55,cx:45,electr:35',4,40000,85000,'↑'],
+ ['prodav','Продавец-консультант','продавец,мерчендайз',0.45,0.9,'Выкладка и учёт:75;Ответы о товаре:60;Живая консультация:20;Решение конфликтов:15','cx:60,sales:60,logist:40',3,40000,60000,'→'],
+ ['logist','Логист','логист,диспетчер,закупщ',0.5,1.0,'Планирование рейсов:85;Документы:85;Переговоры с перевозчиками:30;Нештатные ситуации:20','pm:55,aitrain:45,finan:40',5,70000,100000,'→'],
+ ['pm','Менеджер проектов','менеджер проект,project,руководитель проект',0.3,0.9,'Отчёты и статусы:80;Планирование:55;Работа со стейкхолдерами:10;Управление людьми:10','prod:60,cx:45,aitrain:40',6,100000,160000,'↑'],
+ ['prod','Продакт-менеджер','продакт,product,владелец продукта',0.25,0.9,'Документация:70;Исследования и отчёты:60;Приоритизация:20;Работа с командой:10','pm:70,proddes:40,ml:30',6,120000,200000,'↑'],
+ ['electr','Электрик','электрик,электромонт',0.08,0.4,'Сметы и расчёты:60;Диагностика:30;Монтаж:5;Ремонт на объекте:5','pm:30,teach:30,logist:30',6,60000,95000,'↑'],
+ ['weld','Сварщик','сварщик',0.1,0.5,'Документация:60;Контроль качества швов:40;Сварка на объекте:5;Монтаж конструкций:5','electr:40,teach:30,logist:30',6,60000,100000,'↑'],
+ ['cook','Повар','повар,кондитер,шеф',0.12,0.5,'Закупки и учёт:70;Технологические карты:60;Приготовление:10;Работа на раздаче:10','pm:30,teach:30,logist:35',4,50000,75000,'→'],
+ ['journ','Журналист, редактор','журналист,редактор,корреспондент',0.6,1.2,'Расшифровки:95;Новостные заметки:90;Расследования:15;Интервью:15','market:55,pm:40,aitrain:50',5,70000,85000,'↓'],
+ ['oper','Банковский операционист','операционист,сотрудник отделен,менеджер отделен',0.8,1.3,'Платежи и переводы:90;Открытие счетов:90;Консультация по продуктам:35;Сложные случаи:20','cx:65,compl:55,sales:55',4,60000,65000,'↓'],
+ ['kred','Кредитный специалист','кредитн,андеррайт',0.7,1.2,'Проверка документов:90;Скоринг:85;Сложные сделки:25;Работа с клиентом:25','compl:60,finan:55,sales:55',5,80000,85000,'↓'],
+ ['finan','Финансовый аналитик','финансовый аналит,финаналит',0.45,1.1,'Сбор данных:85;Финансовые модели:55;Выводы для бизнеса:20;Переговоры:15','prod:45,pm:45,ml:40',6,120000,140000,'↑'],
+ ['tax','Налоговый консультант','налогов',0.4,0.9,'Декларации:80;Расчёты:70;Налоговое планирование:25;Сопровождение проверок:15','finan:55,compl:55,jur:40',4,80000,120000,'→'],
+ ['aiacc','Специалист по внедрению ИИ в учёт','внедрен',0.2,0.8,'Настройка ИИ-сервисов:40;Контроль качества:30;Внедрение процессов:15;Обучение сотрудников:10','pm:55,prod:40,finan:45',8,150000,160000,'↑'],
+ ['cx','Специалист клиентского опыта','клиентского опыта,cx,customer',0.35,0.9,'Анализ обращений:70;Скрипты:60;Проектирование сервиса:20;Работа с командами:15','pm:50,prod:45,market:45',4,60000,110000,'↑'],
+ ['aitrain','Тренер ИИ-ассистентов','тренер ии,разметчик,промпт',0.25,0.9,'Разметка данных:70;Оценка ответов:50;Сценарии:25;Контроль качества:25','ml:40,prod:40,pm:45',5,90000,120000,'↑'],
+ ['proddes','Продуктовый дизайнер','продуктовый дизайн,ux,ui',0.35,1.0,'Типовые экраны:75;Прототипы:55;Исследования:25;Продуктовые решения:20','prod:55,pm:45,market:40',7,140000,170000,'↑'],
+ ['ml','ML-инженер','ml,машинн,ии-инженер',0.2,1.0,'Типовой код:60;Эксперименты:40;Постановка задач:15;Архитектура:15','prod:45,pm:40,anal:60',12,220000,260000,'↑'],
+ ['compl','Специалист по комплаенсу','комплаенс',0.35,0.8,'Проверки по спискам:85;Отчётность:70;Оценка рисков:25;Расследования:20','jur:45,finan:45,pm:45',5,80000,130000,'↑'],
+ ['psy','Психолог','психолог,психотерап',0.15,0.5,'Анкеты и тесты:70;Материалы:60;Консультации:5;Групповая работа:5','teach:45,hr:40,cx:40',12,150000,90000,'↑'],
+ ['dvor','Дворник','дворник,уборщик территории',0.12,0.5,'Учёт и документы:60;Планирование работ:40;Общение с клиентом:10;Работа руками на объекте:5','electr:35,logist:30,kur:40',3,20000,50000,'→'],
+ ['uborsh','Уборщик, клинер','уборщ,клинер,горнич',0.15,0.5,'Учёт и документы:60;Планирование работ:40;Общение с клиентом:10;Работа руками на объекте:5','cx:35,logist:30,kur:40',3,20000,50000,'→'],
+ ['ohr','Охранник','охран,секьюрити,чоп',0.45,0.7,'Видеонаблюдение:85;Пропускной режим:75;Обход территории:20;Нештатные ситуации:15','logist:40,electr:35,cx:40',3,30000,55000,'↓'],
+ ['ceo','Генеральный директор','директор,ceo,управляющ,генеральн,гендир,руководитель компании,собственник бизнес,топ-менеджер',0.18,0.6,'Сводки и отчёты:75;Подготовка решений:45;Стратегия:10;Люди и переговоры:5','prod:40,pm:50,psy:20',6,250000,400000,'→'],
+ ['head','Руководитель отдела','руководитель отдел,начальник,head,тимлид,тим лид,заведующ',0.28,0.8,'Сводки и отчёты:75;Подготовка решений:45;Стратегия:10;Люди и переговоры:5','pm:60,prod:50,cx:40',6,150000,220000,'→'],
+ ['predp','Предприниматель','предпринимател,бизнесмен,владелец бизнес',0.2,0.6,'Сводки и отчёты:75;Подготовка решений:45;Стратегия:10;Люди и переговоры:5','pm:40,prod:40,market:40',6,120000,150000,'→'],
+ ['econ','Экономист','экономист',0.65,1.1,'Отчёты и документы:85;Переписка и согласования:70;Нестандартные задачи:25;Работа с людьми:15','finan:70,tax:55,anal:55',6,110000,90000,'↓'],
+ ['audit','Аудитор','аудит',0.6,1.0,'Поиск и анализ документов:80;Типовые заключения:70;Сложные случаи:20;Ответственность и подпись:10','compl:65,finan:60,tax:55',5,90000,120000,'↓'],
+ ['rielt','Риелтор','риелтор,риэлтор,агент по недвиж',0.5,0.9,'CRM и отчёты:80;Подбор вариантов:70;Переговоры:15;Доверие клиента:15','sales:60,cx:50,pm:40',3,50000,100000,'↓'],
+ ['strah','Страховой агент','страховой агент,страховщик',0.6,1.0,'CRM и отчёты:80;Подбор вариантов:70;Переговоры:15;Доверие клиента:15','sales:60,cx:55,compl:45',3,40000,70000,'↓'],
+ ['foto','Фотограф','фотограф',0.55,1.1,'Типовой контент:85;Обработка и монтаж:75;Идея и концепция:25;Работа с заказчиком:20','proddes:40,market:45,aitrain:40',5,70000,70000,'↓'],
+ ['video','Видеомонтажёр','видеомонтаж,монтажер,монтажёр,монтаж видео',0.7,1.3,'Типовой контент:85;Обработка и монтаж:75;Идея и концепция:25;Работа с заказчиком:20','market:50,aitrain:45,proddes:40',5,70000,80000,'↓'],
+ ['music','Музыкант','музыкант,композитор,певец,певица',0.4,0.8,'Типовой контент:85;Обработка и монтаж:75;Идея и концепция:25;Работа с заказчиком:20','teach:50,market:40,psy:25',6,60000,60000,'→'],
+ ['act','Актёр','актер,актёр,актриса',0.3,0.6,'Типовой контент:85;Обработка и монтаж:75;Идея и концепция:25;Работа с заказчиком:20','teach:45,market:35,psy:30',6,60000,60000,'→'],
+ ['blog','Блогер','блогер,инфлюенсер,стример',0.5,1.1,'Типовой контент:85;Обработка и монтаж:75;Идея и концепция:25;Работа с заказчиком:20','market:65,prod:40,aitrain:45',4,60000,90000,'→'],
+ ['hair','Парикмахер','парикмахер,барбер,стилист',0.05,0.4,'Запись и оплата:80;Ответы на типовые вопросы:60;Работа с жалобами:15;Живое обслуживание:10','teach:30,cx:30,market:25',4,40000,70000,'↑'],
+ ['nails','Мастер маникюра','маникюр,бровист,косметолог,визажист',0.05,0.4,'Запись и оплата:80;Ответы на типовые вопросы:60;Работа с жалобами:15;Живое обслуживание:10','teach:30,cx:30,market:30',3,40000,70000,'↑'],
+ ['fit','Фитнес-тренер','фитнес,тренер,персональный тренер,инструктор',0.1,0.5,'Программы тренировок:60;Питание и планы:55;Мотивация клиента:10;Живые тренировки:5','psy:35,teach:40,market:30',4,50000,80000,'↑'],
+ ['pilot','Пилот','пилот,летчик,лётчик',0.3,0.4,'Маршрут и навигация:80;Управление в типовых условиях:40;Нештатные ситуации:15;Работа с людьми:15','teach:35,pm:30,logist:40',12,300000,350000,'→'],
+ ['steward','Бортпроводник','бортпроводни,стюард',0.2,0.5,'Запись и оплата:80;Ответы на типовые вопросы:60;Работа с жалобами:15;Живое обслуживание:10','cx:50,hr:35,teach:30',3,40000,80000,'→'],
+ ['mash','Машинист','машинист',0.45,0.5,'Маршрут и навигация:80;Управление в типовых условиях:40;Нештатные ситуации:15;Работа с людьми:15','logist:55,electr:40,teach:30',6,60000,100000,'↓'],
+ ['police','Полицейский','полицейск,полиция,участков,следовател',0.2,0.5,'Протоколы и документы:80;Проверка по базам:75;Общение с людьми:10;Работа на месте:10','compl:60,jur:45,psy:30',6,80000,80000,'→'],
+ ['voen','Военнослужащий','военн,офицер,солдат,контрактник',0.15,0.4,'Отчётность:70;Мониторинг и разведданные:60;Командование:10;Действия на месте:5','logist:45,pm:40,electr:35',6,80000,110000,'→'],
+ ['fire','Пожарный, спасатель','пожарн,спасател,мчс',0.05,0.3,'Документация:70;Планирование:50;Работа с людьми:10;Практическая помощь:5','teach:35,compl:30,electr:40',6,60000,70000,'→'],
+ ['farm','Фермер, агроном','фермер,агроном,сельск,животновод',0.15,0.5,'Учёт и планирование:65;Контроль техники:40;Полевые работы:10;Уход за животными:10','logist:40,pm:35,anal:30',6,60000,70000,'→'],
+ ['vet','Ветеринар','ветеринар,ветврач',0.1,0.5,'Документация:70;Планирование:50;Работа с людьми:10;Практическая помощь:5','teach:35,psy:25,cx:30',6,60000,80000,'↑'],
+ ['pharm','Фармацевт','фармацевт,провизор,аптек',0.55,0.9,'Подбор аналогов:85;Учёт препаратов:80;Консультация:25;Рецептурный отпуск:20','cx:50,compl:45,teach:35',4,50000,60000,'↓'],
+ ['dent','Стоматолог','стоматолог,дантист',0.12,0.5,'Документация:70;Планирование:50;Работа с людьми:10;Практическая помощь:5','teach:35,psy:25,prod:25',12,200000,200000,'↑'],
+ ['lab','Лаборант','лаборант',0.6,1.0,'Типовые анализы:85;Протоколы:80;Нестандартные пробы:25;Контроль качества:20','anal:50,compl:40,aitrain:40',5,60000,55000,'↓'],
+ ['vosp','Воспитатель, няня','воспитател,няня,гувернант',0.08,0.4,'Документация:70;Планирование:50;Работа с людьми:10;Практическая помощь:5','teach:60,psy:40,hr:30',4,50000,55000,'↑'],
+ ['bibl','Библиотекарь, архивист','библиотек,архивист',0.7,1.0,'Отчёты и документы:85;Переписка и согласования:70;Нестандартные задачи:25;Работа с людьми:15','teach:45,aitrain:45,cx:40',4,40000,45000,'↓'],
+ ['sysadm','Системный администратор','сисадмин,системный админ,администратор сети,devops,девопс',0.5,1.2,'Типовой код и скрипты:75;Мониторинг и рутина:70;Архитектура решений:25;Работа с бизнесом:20','ml:45,prog:50,pm:40',6,120000,140000,'→'],
+ ['ds','Data Scientist','data scien,дата сайент,датасайент',0.3,1.1,'Типовой код и скрипты:75;Мониторинг и рутина:70;Архитектура решений:25;Работа с бизнесом:20','ml:70,prod:45,anal:60',9,180000,220000,'↑'],
+ ['ba','Бизнес-аналитик','бизнес-аналит,бизнес аналит,системный аналит',0.45,1.1,'Отчёты и документы:85;Переписка и согласования:70;Нестандартные задачи:25;Работа с людьми:15','prod:60,pm:55,anal:55',6,120000,160000,'→'],
+ ['wait','Официант, бариста','официант,бариста,бармен',0.25,0.6,'Запись и оплата:80;Ответы на типовые вопросы:60;Работа с жалобами:15;Живое обслуживание:10','cx:55,sales:45,cook:35',3,30000,55000,'→'],
+ ['adm','Администратор','администратор,ресепшн,хостес',0.6,1.0,'Запись и оплата:80;Ответы на типовые вопросы:60;Работа с жалобами:15;Живое обслуживание:10','cx:60,hr:40,pm:40',4,50000,60000,'↓'],
+ ['zakup','Менеджер по закупкам','закупк,снабжен,байер',0.55,1.0,'Отчёты и документы:85;Переписка и согласования:70;Нестандартные задачи:25;Работа с людьми:15','logist:60,finan:45,anal:40',5,70000,100000,'↓'],
+ ['sklad','Кладовщик','кладовщ,складск,комплектовщ',0.55,0.9,'Учёт остатков:90;Сборка заказов:60;Приёмка товара:30;Проблемы с поставками:20','logist:60,electr:35,kur:40',3,40000,60000,'↓'],
+ ['gruz','Грузчик, разнорабочий','грузчик,разнорабоч',0.25,0.5,'Учёт и документы:60;Планирование работ:40;Общение с клиентом:10;Работа руками на объекте:5','sklad:45,electr:40,kur:45',3,30000,55000,'→'],
+ ['mech','Автомеханик','автомехан,автослесар,механик,шиномонтаж',0.1,0.5,'Учёт и документы:60;Планирование работ:40;Общение с клиентом:10;Работа руками на объекте:5','electr:50,logist:30,teach:30',4,50000,90000,'↑'],
+ ['santeh','Сантехник','сантехник,слесарь',0.05,0.4,'Учёт и документы:60;Планирование работ:40;Общение с клиентом:10;Работа руками на объекте:5','electr:55,pm:30,teach:30',4,40000,90000,'↑'],
+ ['stroit','Строитель','строител,прораб,каменщик,бетонщик',0.1,0.5,'Учёт и документы:60;Планирование работ:40;Общение с клиентом:10;Работа руками на объекте:5','pm:45,electr:45,logist:35',4,50000,90000,'↑'],
+ ['plot','Плотник, столяр','плотник,столяр,мебельщик',0.08,0.4,'Учёт и документы:60;Планирование работ:40;Общение с клиентом:10;Работа руками на объекте:5','electr:40,proddes:25,teach:30',4,40000,80000,'→'],
+ ['malar','Маляр, отделочник','маляр,штукатур,отделочник',0.1,0.5,'Учёт и документы:60;Планирование работ:40;Общение с клиентом:10;Работа руками на объекте:5','electr:40,stroit:45,teach:25',3,30000,75000,'→'],
+ ['shvea','Швея','швея,портн,закройщ',0.45,0.7,'Учёт и документы:60;Планирование работ:40;Общение с клиентом:10;Работа руками на объекте:5','proddes:30,teach:30,prodav:40',4,40000,45000,'↓'],
+ ['arch','Архитектор','архитектор',0.35,0.8,'Типовой контент:85;Обработка и монтаж:75;Идея и концепция:25;Работа с заказчиком:20','proddes:50,pm:50,prod:30',6,120000,150000,'→'],
+ ['eng','Инженер','инженер,конструктор,технолог',0.35,0.8,'Типовой код и скрипты:75;Мониторинг и рутина:70;Архитектура решений:25;Работа с бизнесом:20','pm:55,ml:35,anal:45',6,110000,130000,'→'],
+ ['notar','Нотариус','нотариус',0.45,0.7,'Поиск и анализ документов:80;Типовые заключения:70;Сложные случаи:20;Ответственность и подпись:10','jur:60,compl:50,tax:40',6,90000,150000,'↓'],
+ ['judge','Судья','судья',0.2,0.4,'Поиск и анализ документов:80;Типовые заключения:70;Сложные случаи:20;Ответственность и подпись:10','jur:70,compl:40,teach:35',6,90000,180000,'→'],
+ ['korr','Корректор','корректор',0.85,1.4,'Типовой контент:85;Обработка и монтаж:75;Идея и концепция:25;Работа с заказчиком:20','market:50,aitrain:60,teach:40',4,50000,55000,'↓'],
+ ['seo','SEO-специалист','seo,сео',0.7,1.3,'Отчёты и документы:85;Переписка и согласования:70;Нестандартные задачи:25;Работа с людьми:15','market:60,anal:50,prod:40',5,70000,90000,'↓'],
+ ['d3','3D-дизайнер','3d,3д,моделлер',0.45,1.1,'Типовой контент:85;Обработка и монтаж:75;Идея и концепция:25;Работа с заказчиком:20','proddes:50,ml:30,market:35',6,90000,110000,'→'],
+ ['student','Студент','студент,учусь,школьник,выпускник',0,0.5,'#','anal:50,prod:40,cx:50',6,60000,60000,'↑'],
+ ['jobless','Без постоянной работы','бомж,безработ,без работы,не работаю,в поиске работы,ищу работу,тунеядец,без определенного',0,0.5,'#','cx:55,sales:50,kur:50',3,30000,50000,'→']
+];
+const O = {};
+OCC_RAW.forEach(r => { O[r[0]] = { key:r[0], name:r[1], kw:r[2].split(','), e:r[3], s:r[4],
+  tasks:r[5]==='#'?[]:r[5].split(';').map(x=>{const p=x.split(':');return {name:p[0], w:+p[1]};}),
+  targets:r[6].split(',').map(x=>{const p=x.split(':');return {key:p[0], fit:+p[1]};}),
+  course:r[7], price:r[8], pay:r[9], demand:r[10], special:r[5]==='#' }; });
+
+const CLASSES=[
+ [/директор|руковод|начальник|глава |шеф|head|ceo|cto|cfo|управля/,'exec',0.22,0.7,'pm:55,prod:45,cx:40',250000],
+ [/оператор|ассистент|помощник|делопроизвод|секретар|диспетчер|менеджер по работе/,'office',0.75,1.2,'cx:60,aitrain:50,pm:45',70000],
+ [/менеджер|manager|координатор|специалист/,'office',0.45,1.0,'pm:55,prod:40,cx:50',100000],
+ [/инженер|разработ|программ|техник|айти|\bit\b|devops|админ/,'tech',0.4,1.1,'ml:45,pm:50,prod:40',150000],
+ [/дизайн|художник|фото|видео|текст|контент|редакт|иллюстр/,'creative',0.6,1.2,'proddes:45,market:50,aitrain:50',80000],
+ [/врач|медс|сиделк|уход|психо|педагог|учит|воспит|тренер/,'care',0.15,0.5,'teach:45,psy:40,cx:35',80000],
+ [/водит|машин|пилот|космонавт|астронавт|моряк|капитан|курьер|достав|перевоз/,'transport',0.35,0.6,'logist:55,cx:40,electr:35',80000],
+ [/продав|консульт|продаж|агент|кассир/,'sales',0.45,0.9,'sales:55,cx:55,pm:40',70000],
+ [/мастер|рабоч|монтаж|слесар|сварщ|строит|ремонт|оператор станка/,'manual',0.1,0.5,'electr:45,pm:35,logist:35',80000],
+ [/юрист|аудит|эксперт|аналит|бухгалт|финанс|экономист/,'expert',0.55,1.0,'compl:55,finan:55,anal:50',110000]
+];
+const TPL={office:'Отчёты и документы:85;Переписка и согласования:70;Нестандартные задачи:25;Работа с людьми:15',manual:'Учёт и документы:60;Планирование работ:40;Общение с клиентом:10;Работа руками на объекте:5',creative:'Типовой контент:85;Обработка и монтаж:75;Идея и концепция:25;Работа с заказчиком:20',care:'Документация:70;Планирование:50;Работа с людьми:10;Практическая помощь:5',exec:'Сводки и отчёты:75;Подготовка решений:45;Стратегия:10;Люди и переговоры:5',tech:'Типовой код и скрипты:75;Мониторинг и рутина:70;Архитектура решений:25;Работа с бизнесом:20',expert:'Поиск и анализ документов:80;Типовые заключения:70;Сложные случаи:20;Ответственность и подпись:10',transport:'Маршрут и навигация:80;Управление в типовых условиях:40;Нештатные ситуации:15;Работа с людьми:15',sales:'CRM и отчёты:80;Подбор вариантов:70;Переговоры:15;Доверие клиента:15'};
+function makeCustom(q){
+  const n=norm(q); let c=CLASSES.find(x=>x[0].test(n)); if(!c) c=[null,'office',0.45,1.0,'pm:50,cx:50,aitrain:45',90000];
+  const name=q.trim().charAt(0).toUpperCase()+q.trim().slice(1);
+  O.custom={key:'custom',name:name,kw:[],e:c[2],s:c[3],tasks:TPL[c[1]].split(';').map(x=>{const p=x.split(':');return{name:p[0],w:+p[1]};}),
+    targets:c[4].split(',').map(x=>{const p=x.split(':');return{key:p[0],fit:+p[1]};}),course:6,price:90000,pay:c[5],demand:'→',custom:true};
+  return 'custom';
+}
+const POPULAR=['buh','call','ceo','dvor','prog','teach','driver','jur','oper','dizg','copy','doc'];
+const EXPENSES=60000, LESSONS=8;
+function income(){const o=O[S.occ||'buh'];if(o.key==='student')return 20000;if(o.key==='jobless')return 15000;return Math.round((o.pay||98400)/100)*100;}
+function incomeName(){const o=O[S.occ||'buh'];return o.key==='student'?'стипендия и подработка':(o.key==='jobless'?'подработка':'зарплата');}
+function expenses(){const o=O[S.occ||'buh'];return o.special?20000:Math.min(EXPENSES,Math.round(income()*0.65/1000)*1000);}
+
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=t=>String(t||'').toLowerCase().replace(/ё/g,'е').trim();
+const fmt=n=>Math.round(n).toLocaleString('ru-RU')+' ₽';
+const plural=(n,a,b,c)=>{const m10=n%10,m100=n%100;if(m10===1&&m100!==11)return a;if(m10>=2&&m10<=4&&(m100<10||m100>=20))return b;return c;};
+const MON=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+const monthLabel=off=>{const a=9+off;return MON[a%12]+' '+(2026+Math.floor(a/12));};
+const riskCol=p=>p>=60?'var(--red)':(p>=25?'var(--amber)':'var(--green)');
+const riskTag=p=>p>=60?'r':(p>=25?'a':'g');
+
+function match(q){const n=norm(q);if(n.length<2)return[];return Object.keys(O).filter(k=>{const o=O[k];if(k==='custom')return false;if(norm(o.name).indexOf(n)>=0)return true;return o.kw.some(w=>{const nw=norm(w);return n.indexOf(nw)>=0||(n.length>=4&&nw.indexOf(n)>=0);});});}
+function risk(o,bump){const e=Math.min(0.95,o.e+(bump||0));const mid=1.5+(1-e)*9/o.s;const pmax=Math.min(0.95,0.35+e*0.65);const floor=e*0.35;const P=t=>floor+(pmax-floor)/(1+Math.exp(-0.65*(t-mid)));let t50=99;for(let t=0;t<=30;t+=0.1){if(P(t)>=0.5){t50=Math.max(0.5,t);break;}}const bars=[];for(let y=2027;y<=2036;y++){const p=Math.round(P(y-2026)*100);bars.push({y:String(y).slice(2),p,h:Math.max(3,Math.round(p*0.98))});}return{t50,p2031:Math.round(P(5)*100),p2036:Math.round(P(10)*100),bars};}
+const tierOf=r=>r.p2036>=65?'high':(r.p2036>=30?'mid':'low');
+
+function initial(){return{anim:false,screen:'input',tab:'home',query:'',occ:null,notFound:false,bump:0,shared:false,
+  target:null, compassFilter:'fit',
+  save:{on:false,pct:8,roundup:false,balance:0,insurance:false},
+  learn:{started:false,done:0,streak:0},
+  job:{resume:false,applied:[],invited:false,prepared:false,offer:false,salaryMoved:false},
+  agent:[],agentWeek:0,agentSaved:0,push:null,toast:null,returns:0,log:[],weeks:0};}
+let S=initial();
+
+function occ(){return O[S.occ||'buh'];}
+function tgt(){return S.target&&S.target!=='stay'&&O[S.target]&&!O[S.target].special?O[S.target]:null;}
+function goalName(){const t=tgt();return t?t.name:('Сильнее в профессии «'+occ().name+'»');}
+function coursePrice(){const t=tgt();return t?t.price:40000;}
+function cushionTarget(){const t=tierOf(risk(occ(),S.bump));return (occ().special?3:(t==='high'?4:(t==='mid'?3:2)))*expenses();}
+function score(){
+  const r=risk(occ(),S.bump);
+  let s=Math.round(20*(1-r.p2036/100));
+  if(S.target) s+=10;
+  s+=Math.round(22*Math.min(1,S.save.balance/cushionTarget()));
+  if(S.save.insurance) s+=3;
+  s+=Math.round(30*S.learn.done/LESSONS);
+  const j=S.job; s+=Math.round(15*((j.resume?1:0)+(j.applied.length?1:0)+(j.invited&&j.prepared?1:0)+(j.offer?1:0))/4);
+  return Math.min(100,s);
+}
+const LEVELS=[[0,'Уязвим','#FF8A80'],[30,'Готовлюсь','#FFC46B'],[55,'Защищён','#7EDB9C'],[80,'Востребован','#8EC5FF']];
+function level(s){let L=LEVELS[0],N=null;for(let i=0;i<LEVELS.length;i++){if(s>=LEVELS[i][0]){L=LEVELS[i];N=LEVELS[i+1]||null;}}return{name:L[1],color:L[2],from:L[0],next:N};}
+
+function nextStep(){
+  const j=S.job;
+  if(!S.target) return {t:'Выберите профессию будущего',d:'Компас покажет, куда засчитается ваш опыт и где риск ниже',act:'tab',arg:'compass',pts:10};
+  if(!S.save.on) return {t:'Включите копилку перехода',d:'Подушка на время смены работы копится сама с каждой зарплаты',act:'tab',arg:'save',pts:'до 22'};
+  if(!S.learn.started) return {t:'Начните обучение',d:'Курс «'+goalName()+'» — оплата частями, пока учитесь',act:'tab',arg:'learn',pts:4};
+  if(!j.resume) return {t:'Соберите резюме под новую профессию',d:'Агент перенесёт опыт из текущей работы за минуту',act:'tab',arg:'job',pts:4};
+  if(S.learn.done<4) return {t:'Урок '+(S.learn.done+1)+' из '+LESSONS,d:'40 минут — и +4 к защищённости',act:'tab',arg:'learn',pts:4};
+  if(j.applied.length<2) return {t:'Откликнитесь на 2 вакансии',d:'Проверьте рынок, пока у вас есть работа',act:'tab',arg:'job',pts:4};
+  if(j.invited&&!j.prepared) return {t:'Подготовьтесь к собеседованию',d:'Тренировка с ИИ-интервьюером — 15 минут',act:'tab',arg:'job',pts:4};
+  if(j.invited&&!j.offer) return {t:'Пройдите собеседование',d:'Вас ждут в пятницу, 15:00',act:'tab',arg:'job',pts:4};
+  if(j.offer&&!j.salaryMoved) return {t:'Получайте новую зарплату в Сбер',d:'Копилка, кредит и план уже здесь',act:'tab',arg:'job',pts:0};
+  if(S.learn.done<LESSONS) return {t:'Урок '+(S.learn.done+1)+' из '+LESSONS,d:'Закончите курс — получите сертификат',act:'tab',arg:'learn',pts:4};
+  return {t:'Вы защищены',d:'Следим за риском профессии и пересчитываем раз в квартал',act:'tab',arg:'home',pts:0};
+}
+
+function agentSet(i){const n=goalName();const sets=[
+ [['Записал вас на урок 1 — четверг, 19:00, онлайн',0],['Нашёл этот же курс у партнёра на 12 000 ₽ дешевле. Переоформить?',12000],['Подготовил заявление на налоговый вычет за обучение',0]],
+ [['Подготовил 3 отклика на стажировки «'+n+'». Отправить?',0],['Перенёс отчисление в копилку на день аванса — копится на 2 недели быстрее',0],['Нашёл бесплатный вебинар работодателя, который нанимает на эту роль',0]],
+ [['Договорился о звонке с рекрутером во вторник, 12:00. Подтвердить?',0],['Обновил резюме: добавил 2 кейса из курса',0],['Можно снизить платёж по кредиту на время поиска работы на 1 800 ₽ в месяц',1800]]];
+ return sets[i].map((x,j)=>({id:i+'-'+j+'-'+Date.now(),text:x[0],saving:x[1],status:'pending'}));}
+const addLog=(tag,text)=>{S.log=[{tag,text}].concat(S.log).slice(0,6);};
+function lessons(){const n=goalName();return['Как устроена работа «'+n+'»','ИИ-инструменты: что делает машина, что вы','Базовые навыки, часть 1','Базовые навыки, часть 2','Кейс на реальных данных','Как перенести опыт из прошлой профессии','Портфолио: 2 кейса','Подготовка к собеседованию'];}
+function vacancies(){const t=tgt();const base=t?t.pay:Math.round(occ().pay*1.15);const n=goalName().replace('Сильнее в профессии','Старший специалист,').replace(/[«»]/g,'');
+  return[{id:'v1',title:t?t.name:occ().name+' (старший)',meta:'Финтех · Москва · гибрид',pay:base},{id:'v2',title:t?t.name:occ().name+' (ведущий)',meta:'Ритейл · удалённо',pay:Math.round(base*0.92)},{id:'v3',title:(t?t.name:occ().name)+' — стажировка с переходом',meta:'Банк · Москва · офис',pay:Math.round(base*0.8)}];}
+
+/* ---------- actions wrapper: score delta toast ---------- */
+function mutate(fn,opts){const before=score();fn();const after=score();if(after>before)S.toast='+'+(after-before)+' к защищённости · '+after+'/100';else if(opts&&opts.toast)S.toast=opts.toast;render();if(S.toast){const t=S.toast;setTimeout(()=>{if(S.toast===t){S.toast=null;const el=document.getElementById('toast');if(el)el.remove();}},2200);}}
+
+/* ---------- views ---------- */
+const IC={
+ back:'<path d="M15 18l-6-6 6-6"/>',
+ home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
+ compass:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+ save:'<path d="M5 11a7 6 0 0 1 14 0v4a2 2 0 0 1-2 2h-1v2h-3v-2h-2v2H8v-2a4 4 0 0 1-3-4z"/><path d="M12 7V5"/>',
+ learn:'<path d="M3 8l9-4 9 4-9 4z"/><path d="M7 10v5c3 2 7 2 10 0v-5"/>',
+ job:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5h6v2"/>'
+};
+const svg=(k,c)=>'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="'+(c||'currentColor')+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+IC[k]+'</svg>';
+function topbar(title,back){return '<div class="top">'+(back?'<button class="iconbtn" data-act="back" aria-label="Назад">'+svg('back','#14171A')+'</button>':'')+'<h1>'+esc(title)+'</h1></div>';}
+
+function suggestHtml(){const n=norm(S.query);const m=n.length>=2?match(S.query):[];const keys=n.length>=2?m.slice(0,6):POPULAR.slice(0,8);
+  const label=n.length>=2?(m.length>1?'Уточните — нашли несколько профессий:':(m.length===1?'Нашли:':'')):'Часто проверяют:';
+  if(!keys.length)return'';return'<p class="hint">'+label+'</p><div class="chips">'+keys.map(k=>'<button class="chip" data-act="pick" data-arg="'+k+'">'+esc(O[k].name)+'</button>').join('')+'</div>';}
+
+function vInput(){
+  return '<div class="hero"><h2>Заменит ли ИИ вашу работу?</h2><label for="prof-input"><p>Введите профессию — покажем вероятность, срок и что делать, чтобы успеть</p></label>'+
+  '<input id="prof-input" class="field" type="text" autocomplete="off" placeholder="Например: бухгалтер" value="'+esc(S.query)+'">'+
+  '<button class="btn bright" data-act="calc">Узнать</button><p class="warn" id="nf"'+(S.notFound?'':' hidden')+'>Введите хотя бы пару букв.</p></div>'+
+  '<div id="sugg" style="display:flex;flex-direction:column;gap:8px">'+suggestHtml()+'</div>'+
+  (S.target?'<button class="next" data-act="toHub"><span style="font-size:13px;opacity:.85">Мой карьерный щит</span><strong style="font-size:18px">Защищённость '+score()+'/100 · '+level(score()).name+'</strong></button>':'')+
+  '<p class="hint" style="padding:0 4px">Профессию указываете вы. Мы не делаем выводов по работодателю или тратам.</p>';
+}
+
+function vResult(){
+  const o=occ(),r=risk(o,S.bump),tier=tierOf(r);
+  const byW=o.tasks.slice().sort((a,b)=>b.w-a.w),top=byW[0]||{name:'рутина',w:0},human=byW[byW.length-1]||{name:'живая работа',w:0};
+  const years=Math.max(1,Math.round(r.t50));
+  const when=r.t50>20?'более 20 лет':('через ~'+years+' '+plural(years,'год','года','лет')+' ('+(2026+years)+')');
+  const tierLabel=tier==='high'?'Высокий риск':(tier==='mid'?'Средний риск':'Низкий риск');
+  const tierBg=tier==='high'?'var(--redSoft)':(tier==='mid'?'var(--amberSoft)':'var(--greenSoft)');
+  const scoreC=hueCol(r.p2036);
+  const verdict=o.special?(o.key==='jobless'?'ИИ нечего у вас забрать — а вот помочь он может. Подберём профессию, где риск замены низкий, дадим короткое обучение в рассрочку и найдём работу. Копилка поможет продержаться, пока ищете.':'Хорошая новость: вы выбираете профессию сейчас, когда уже видно, какие работы заберёт ИИ. Компас покажет, куда идти, чтобы через 10 лет быть востребованным.'):(o.custom?'Точной профессии нет в базе — оценили по похожим задачам. ':'')+(tier==='high'?'ИИ уже уверенно делает «'+top.name+'» — около '+top.w+'% этой части работы. Профессию не отменят за один день, но людей в ней будут сокращать раньше: переходить лучше заранее, пока есть доход.'
+   :(tier==='mid'?'ИИ заберёт рутину — «'+top.name+'», но «'+human.name+'» останется за человеком. Кто освоит ИИ-инструменты, станет ценнее; кто нет — будет конкурировать с ИИ по цене.'
+   :'Работа руками и с людьми: ИИ здесь помощник, а не замена. «'+human.name+'» останется за вами надолго. Рутину вроде «'+top.name+'» можно отдать ИИ уже сейчас.'));
+  const others=POPULAR.filter(k=>k!==o.key).slice(0,6);
+  const sc0=Math.round(20*(1-r.p2036/100));
+  return '<div class="score"><span style="color:#C9CED2;font-size:13px">Риск замены ИИ для профессии</span><strong style="font-size:20px">'+esc(o.name)+'</strong>'+
+   '<div class="gauge" id="gauge" data-target="'+r.p2036+'"><svg viewBox="0 0 200 116" width="230" height="134" aria-hidden="true"><defs><linearGradient id="gg" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#3FBF6A"/><stop offset=".5" stop-color="#F2B233"/><stop offset="1" stop-color="#F0584C"/></linearGradient></defs><path d="M16 100 A84 84 0 0 1 184 100" fill="none" stroke="#2E3338" stroke-width="16" stroke-linecap="round"/><path id="garc" d="M16 100 A84 84 0 0 1 184 100" fill="none" stroke="url(#gg)" stroke-width="16" stroke-linecap="round" pathLength="100" stroke-dasharray="'+(S.anim?0:r.p2036)+' 100"/><line id="gneedle" x1="100" y1="100" x2="100" y2="30" stroke="#fff" stroke-width="4" stroke-linecap="round" transform="rotate('+(S.anim?-90:(-90+r.p2036*1.8))+' 100 100)"/><circle cx="100" cy="100" r="8" fill="#fff"/></svg><div class="big" id="bigNum" style="color:'+(S.anim?'#3FBF6A':scoreC)+'">'+(S.anim?0:r.p2036)+'%</div></div><span class="scan" id="scanTxt">'+(S.anim?'Анализируем задачи профессии…':'')+'</span><span style="color:#D0D5D9;font-size:14px">вероятность, что ИИ заберёт бо́льшую часть работы в ближайшие 10 лет</span><span style="color:#9AA1A7;font-size:13px">к 2031 — '+r.p2031+'%</span>'+
+   '<div class="pills'+(S.anim?' pre':'')+'" id="pills"><span class="pill" style="background:'+tierBg+';color:'+riskCol(r.p2036)+'">'+tierLabel+'</span><span class="pill" style="background:var(--dark2);color:#fff">Точка 50%: '+when+'</span></div></div>'+
+  '<div class="card"><span class="eyebrow" style="color:'+riskCol(r.p2036)+'">Вердикт</span><div>'+esc(verdict)+'</div></div>'+
+  '<div class="next" style="background:var(--dark)"><span style="font-size:13px;color:#B8BFC4">Ваша защищённость сейчас</span><div class="row"><strong style="font-size:28px">'+sc0+'/100</strong><span class="pill" style="background:#3A1F1D;color:#FF8A80">Уязвим</span></div><div class="track" style="background:#2E3338"><i style="width:'+sc0+'%;background:#FF8A80"></i></div><span style="font-size:14px;color:#D0D5D9">Поднимите её до 80+ за 4 шага. Каждый шаг — реальное действие в Сбере.</span></div>'+
+  '<div class="grid2">'+
+   [['compass','Компас','Куда перейти с вашим опытом'],['save','Копилка','Подушка на время перехода'],['learn','Обучение','Курс с оплатой частями'],['job','Работа','Резюме, отклики, оффер']].map(x=>'<button class="tile" data-act="toHubTab" data-arg="'+x[0]+'">'+svg(x[0],'#137A3F')+'<span class="t">'+x[1]+'</span><span class="hint">'+x[2]+'</span></button>').join('')+'</div>'+
+  '<button class="btn" data-act="toHub" style="height:56px">Защитить свой доход</button>'+
+  '<div class="card"><strong>Вероятность по годам</strong><div class="bars'+(S.anim?' grow':'')+'">'+r.bars.map((b,i)=>'<div class="bar"><em style="animation-delay:'+(1.6+i*0.08)+'s">'+b.p+'</em><i style="height:'+b.h+'px;background:'+riskCol(b.p)+';animation-delay:'+(1.5+i*0.08)+'s"></i><small>'+b.y+'</small></div>').join('')+'</div></div>'+
+  (o.special?'':'<div class="card"><strong>Что уйдёт к ИИ первым</strong>'+byW.map(t=>'<div style="display:flex;flex-direction:column;gap:6px"><div class="row" style="font-size:14px"><span>'+esc(t.name)+'</span><b style="color:'+riskCol(t.w)+'">'+t.w+'%</b></div><div class="track"><i style="width:'+t.w+'%;background:'+riskCol(t.w)+'"></i></div></div>').join('')+'</div>')+
+  '<button class="btn ghost" data-act="share">Поделиться результатом</button>'+(S.shared?'<p class="hint" style="text-align:center;color:var(--green)">Ссылка скопирована. Друг проверит свою профессию — в Сбере.</p>':'')+
+  '<div class="card"><strong>А как у близких?</strong><div class="chips">'+others.map(k=>{const p=risk(O[k],0).p2036;return'<button class="chip" data-act="pick" data-arg="'+k+'">'+esc(O[k].name)+' · <b style="color:'+riskCol(p)+'">'+p+'%</b></button>';}).join('')+'</div></div>'+
+  '<p class="hint" style="font-size:11px;padding:0 4px">Модель: доля автоматизируемых задач профессии × скорость внедрения ИИ в отрасли. Оценка для профессии, а не для вас лично. Пересчёт раз в квартал. Демо-коэффициенты.</p>';
+}
+
+function vHome(){
+  const s=score(),L=level(s),r=risk(occ(),S.bump),ns=nextStep();
+  const toNext=L.next?(L.next[0]-s):0;
+  const pend=S.agent.filter(a=>a.status==='pending').length;
+  const ct=cushionTarget(),savePct=Math.min(100,Math.round(S.save.balance/ct*100));
+  const j=S.job,jobPct=Math.round(((j.resume?1:0)+(j.applied.length?1:0)+(j.invited&&j.prepared?1:0)+(j.offer?1:0))/4*100);
+  return '<div class="hero" style="gap:12px"><div style="display:flex;gap:16px;align-items:center">'+
+    '<div class="ring" style="background:conic-gradient('+L.color+' '+Math.round(s*3.6)+'deg,#2E3338 0deg)"><div><strong style="font-size:30px;line-height:1">'+s+'</strong><span style="font-size:11px;color:#B8BFC4">из 100</span></div></div>'+
+    '<div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;color:#B8BFC4">Защищённость дохода</span><strong style="font-size:24px;color:'+L.color+'">'+L.name+'</strong><span style="font-size:13px;color:#D0D5D9">'+(L.next?'До уровня «'+L.next[1]+'» — '+toNext+' '+plural(toNext,'балл','балла','баллов'):'Максимальный уровень')+'</span></div></div>'+
+    '<div style="display:flex;justify-content:space-between;font-size:12px;color:#9AA1A7">'+LEVELS.map(l=>'<span style="color:'+(s>=l[0]?l[2]:'#6B7278')+'">'+l[1]+'</span>').join('')+'</div>'+
+    '<div class="track" style="background:#2E3338"><i style="width:'+s+'%;background:'+L.color+'"></i></div>'+
+    '<span style="font-size:13px;color:#B8BFC4">Риск «'+esc(occ().name)+'» за 10 лет: <b style="color:#fff">'+r.p2036+'%</b>'+(S.target?' · цель: <b style="color:#fff">'+esc(goalName())+'</b>':'')+'</span></div>'+
+  '<button class="next" data-act="'+ns.act+'" data-arg="'+ns.arg+'"><span style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.85">Следующий шаг'+(ns.pts?' · +'+ns.pts:'')+'</span><strong style="font-size:18px">'+esc(ns.t)+'</strong><span style="font-size:14px;opacity:.9">'+esc(ns.d)+'</span></button>'+
+  '<div class="grid2">'+
+   tile('compass','Компас',S.target?esc(goalName()):'Цель не выбрана',S.target?100:0,S.target?'Есть цель':'Выбрать')+
+   tile('save','Копилка',S.save.on?fmt(S.save.balance)+' из '+fmt(ct):'Выключена',savePct,S.save.on?savePct+'%':'Включить')+
+   tile('learn','Обучение',S.learn.started?S.learn.done+' из '+LESSONS+' уроков':'Не начато',Math.round(S.learn.done/LESSONS*100),S.learn.started?Math.round(S.learn.done/LESSONS*100)+'%':'Начать')+
+   tile('job','Работа',j.offer?'Оффер получен':(j.invited?'Приглашение':(j.applied.length?'Откликов: '+j.applied.length:(j.resume?'Резюме готово':'Резюме нет'))),jobPct,jobPct+'%')+
+  '</div>'+
+  (S.target?agentCard(pend):'');
+}
+function tile(k,t,sub,pct,badge){return '<button class="tile" data-act="tab" data-arg="'+k+'"><div class="row">'+svg(k,'#137A3F')+'<span class="tag g">'+badge+'</span></div><span class="t">'+t+'</span><span class="hint">'+sub+'</span><div class="track"><i style="width:'+pct+'%;background:var(--green2)"></i></div></button>';}
+function agentCard(pend){
+  if(!S.agent.length) return '';
+  return '<div class="card" style="border:2px solid var(--green)"><div class="row"><span class="eyebrow">Агент на этой неделе</span><span class="hint">ждут: '+pend+'</span></div>'+
+   S.agent.map(a=>'<div class="item"><div style="font-weight:500">'+esc(a.text)+'</div>'+(a.status==='pending'?'<div style="display:flex;gap:8px"><button class="btn sm" data-act="approve" data-arg="'+a.id+'">Подтвердить</button><button class="btn sm ghost" data-act="decline" data-arg="'+a.id+'">Не надо</button></div>':(a.status==='done'?'<b style="color:var(--green);font-size:13px">Сделано</b>':'<span class="hint">Отклонено — агент учтёт</span>'))+'</div>').join('')+
+   '<span class="hint" style="font-size:12px">Агент действует только после вашего «да». Сэкономил: '+fmt(S.agentSaved)+'</span></div>';
+}
+
+function vCompass(){
+  const o=occ();
+  const fitMap={};o.targets.forEach(t=>fitMap[t.key]=t.fit);
+  let keys=Object.keys(O).filter(k=>k!==o.key&&!O[k].special&&k!=='custom');
+  if(S.compassFilter==='fit') keys=keys.filter(k=>fitMap[k]);
+  const list=keys.map(k=>{const x=O[k],p=risk(x,0).p2036;const fit=fitMap[k]||Math.max(15,40-Math.round(Math.abs(x.e-o.e)*30));const score=(100-p)*0.5+fit*0.3+(x.demand==='↑'?20:(x.demand==='→'?10:0));return{k,x,p,fit,score};}).sort((a,b)=>b.score-a.score);
+  const dem=d=>d==='↑'?'<span class="tag g">Спрос растёт</span>':(d==='→'?'<span class="tag">Спрос стабилен</span>':'<span class="tag r">Спрос падает</span>');
+  return '<div class="card" style="background:var(--dark);color:#fff"><span class="eyebrow" style="color:#7EDB9C">Компас профессий будущего</span><strong style="font-size:18px">'+(o.special?'Куда пойти работать, чтобы ИИ не заменил':'Куда перейти из профессии «'+esc(o.name)+'»')+'</strong><span style="font-size:13px;color:#C9CED2">Сортировка: ниже риск ИИ, выше спрос, больше засчитается вашего опыта</span></div>'+
+   '<div class="chips"><button class="chip'+(S.compassFilter==='fit'?' on':'')+'" data-act="cfilter" data-arg="fit">Подходят мне</button><button class="chip'+(S.compassFilter==='all'?' on':'')+'" data-act="cfilter" data-arg="all">Все профессии</button></div>'+
+   (o.special?'':'<button class="card tap" data-act="setTarget" data-arg="stay"'+(S.target==='stay'?' style="box-shadow:0 0 0 2px var(--green) inset"':'')+'><div class="row"><strong>Остаться и усилиться</strong>'+(S.target==='stay'?'<span class="tag g">Ваша цель</span>':'')+'</div><span class="hint">ИИ-инструменты в текущей работе и курс, который поднимает ставку</span></button>')+
+   list.map(i=>'<div class="card"><div class="row"><strong style="font-size:16px">'+esc(i.x.name)+'</strong>'+(S.target===i.k?'<span class="tag g">Ваша цель</span>':'')+'</div>'+
+     '<div class="tags"><span class="tag '+riskTag(i.p)+'">Риск ИИ: '+i.p+'%</span>'+dem(i.x.demand)+'<span class="tag b">от '+fmt(i.x.pay)+'</span><span class="tag">Опыт засчитается ~'+i.fit+'%</span></div>'+
+     '<span class="hint">Обучение: '+i.x.course+' мес. · '+fmt(i.x.price)+' · частями от '+fmt(Math.round(i.x.price*0.025/10)*10)+'/мес</span>'+
+     (S.target===i.k?'':'<button class="btn outline sm" style="width:100%" data-act="setTarget" data-arg="'+i.k+'">Выбрать целью</button>')+'</div>').join('');
+}
+
+function vSave(){
+  const ct=cushionTarget(),bal=S.save.balance,pct=Math.min(100,Math.round(bal/ct*100));
+  const per=Math.round(income()*S.save.pct/100/10)*10+(S.save.roundup?600:0);
+  const months=per>0?Math.ceil(Math.max(0,ct-bal)/(per*2)):0;
+  return '<div class="hero" style="gap:10px"><span style="font-size:13px;color:#B8BFC4">Копилка перехода · накопительный счёт Сбера</span><strong style="font-size:34px;font-variant-numeric:tabular-nums">'+fmt(bal)+'</strong><span style="font-size:14px;color:#D0D5D9">Цель — '+fmt(ct)+': '+Math.round(ct/expenses())+' мес. ваших расходов на время '+(occ().special?'поиска':'смены')+' работы</span>'+
+   '<div class="track" style="background:#2E3338"><i style="width:'+pct+'%;background:#7EDB9C"></i></div><span style="font-size:13px;color:#D0D5D9">'+(S.save.on?(bal>=ct?'Подушка собрана — можно переходить спокойно':'Соберёте к '+monthLabel(months)+' · '+pct+'%'):'Копилка выключена')+'</span></div>'+
+   (!S.save.on?'<button class="btn" data-act="saveOn">Включить копилку — 8% с каждой зарплаты</button>':'')+
+   '<div class="card"><strong>Правила пополнения</strong>'+
+    '<div class="toggle"><div><div style="font-weight:600">'+S.save.pct+'% '+(occ().special?'с каждого дохода':'с каждой зарплаты')+'</div><span class="hint">'+fmt(Math.round(income()*S.save.pct/100/10)*10)+(occ().special?' с каждого поступления':' в день зарплаты и аванса')+'</span></div><button class="sw'+(S.save.on?' on':'')+'" data-act="saveToggle" aria-label="Отчисления с зарплаты"></button></div>'+
+    '<div class="toggle"><div><div style="font-weight:600">Процент отчислений</div><span class="hint">Больше — быстрее к цели</span></div><div style="display:flex;gap:6px">'+[5,8,12].map(v=>'<button class="chip'+(S.save.pct===v?' on':'')+'" style="height:36px;padding:0 10px" data-act="savePct" data-arg="'+v+'">'+v+'%</button>').join('')+'</div></div>'+
+    '<div class="toggle"><div><div style="font-weight:600">Округление покупок</div><span class="hint">Сдача до 100 ₽ с каждой покупки — ~600 ₽ за полмесяца</span></div><button class="sw'+(S.save.roundup?' on':'')+'" data-act="roundup" aria-label="Округление покупок"></button></div>'+
+    '<div class="toggle"><div><div style="font-weight:600">Страховка дохода · 590 ₽/мес</div><span class="hint">Сократят раньше — 3 выплаты по 60 000 ₽</span></div><button class="sw'+(S.save.insurance?' on':'')+'" data-act="insurance" aria-label="Страховка дохода"></button></div>'+
+   '</div>'+
+   '<div class="grid2"><button class="btn ghost" data-act="topup" data-arg="5000">+ 5 000 ₽</button><button class="btn ghost" data-act="topup" data-arg="15000">+ 15 000 ₽</button></div>'+
+   '<p class="hint" style="padding:0 4px">Деньги лежат на накопительном счёте и приносят доход. Снять можно в любой момент.</p>';
+}
+
+function vLearn(){
+  if(!S.target) return emptyGoal('обучение');
+  const L=lessons(),done=S.learn.done,price=coursePrice();
+  const payS=Math.round(price*0.025/10)*10,payA=Math.round(price*0.055/10)*10;
+  let body='';
+  if(!S.learn.started){
+    body='<div class="card"><span class="eyebrow">Оплата курса</span><strong style="font-size:17px">'+fmt(price)+' — образовательный кредит</strong><span class="hint" style="font-size:14px">'+fmt(payS)+' в месяц, пока учитесь. '+fmt(payA)+' — после выхода на новую работу. Вычет за обучение вернёт до '+fmt(Math.min(price,150000)*0.13)+'.</span><button class="btn" data-act="startLearn">Начать обучение</button></div>';
+  }
+  return '<div class="card" style="background:var(--dark);color:#fff"><span class="eyebrow" style="color:#7EDB9C">Курс</span><strong style="font-size:18px">'+esc(goalName())+'</strong><div class="row"><span style="font-size:13px;color:#C9CED2">'+done+' из '+LESSONS+' уроков'+(S.learn.streak?' · серия '+S.learn.streak+' нед.':'')+'</span><b style="color:#7EDB9C">'+Math.round(done/LESSONS*100)+'%</b></div><div class="track" style="background:#2E3338"><i style="width:'+Math.round(done/LESSONS*100)+'%;background:#7EDB9C"></i></div></div>'+
+   body+
+   '<div class="card" style="gap:0">'+L.map((t,i)=>{const st=i<done?'done':(i===done&&S.learn.started?'next':'lock');
+     return '<div class="lesson"><span class="n" style="background:'+(st==='done'?'var(--green)':(st==='next'?'var(--greenSoft)':'#EDF0EB'))+';color:'+(st==='done'?'#fff':(st==='next'?'var(--green)':'var(--muted)'))+'">'+(st==='done'?'✓':(i+1))+'</span><div style="flex:1;display:flex;flex-direction:column"><span style="font-weight:600;'+(st==='lock'?'color:var(--muted)':'')+'">'+esc(t)+'</span><span class="hint">40 мин'+(i===7?' · тренировка с ИИ-интервьюером':'')+'</span></div>'+(st==='next'?'<button class="btn sm" data-act="lesson">Пройти</button>':'')+'</div>';}).join('')+'</div>'+
+   (done>=LESSONS?'<div class="card" style="background:var(--greenSoft)"><strong>Сертификат получен</strong><span class="hint">Добавлен в резюме автоматически</span></div>':'');
+}
+
+function vJob(){
+  if(!S.target) return emptyGoal('поиск работы');
+  const j=S.job,V=vacancies();
+  let out='<div class="card" style="background:var(--dark);color:#fff"><span class="eyebrow" style="color:#7EDB9C">Работа</span><strong style="font-size:18px">'+esc(goalName())+'</strong><span style="font-size:13px;color:#C9CED2">Ищите, пока работаете: переход без паузы в доходе</span></div>';
+  if(j.offer){
+    out+='<div class="card" style="background:var(--green);color:#fff"><strong style="font-size:19px">Оффер получен</strong><span style="color:#E3F3E8">'+esc(V[0].title)+' · '+fmt(V[0].pay)+' — на '+Math.round((V[0].pay/income()-1)*100)+(occ().special?'':'')+'% выше текущего дохода</span>'+
+     (j.salaryMoved?'<strong>Заявление для бухгалтерии готово. Зарплата будет приходить в Сбер.</strong>':'<button class="btn white" data-act="moveSalary">Получать новую зарплату в Сбер</button>')+'</div>';
+  }
+  out+='<div class="card"><div class="row"><strong>Резюме</strong>'+(j.resume?'<span class="tag g">Готово</span>':'')+'</div><span class="hint">'+(j.resume?'3 кейса из вашего опыта'+(S.learn.done>=LESSONS?' + сертификат курса':'')+' под профессию «'+esc(goalName())+'»':'Агент соберёт резюме под новую профессию из вашего опыта')+'</span>'+(j.resume?'':'<button class="btn" data-act="resume">Собрать резюме с агентом</button>')+'</div>';
+  if(j.invited&&!j.offer){
+    out+='<div class="card" style="border:2px solid var(--green)"><span class="eyebrow">Приглашение на собеседование</span><strong>'+esc(V[0].title)+' · пятница, 15:00</strong>'+
+     (j.prepared?'<span class="tag g" style="align-self:flex-start">Тренировка пройдена</span><button class="btn" data-act="interview">Пройти собеседование</button>':'<button class="btn" data-act="prepare">Тренировка с ИИ-интервьюером · 15 мин</button>')+'</div>';
+  }
+  out+='<strong style="padding:4px 4px 0">Вакансии для вас</strong>'+V.map(v=>{const ap=j.applied.indexOf(v.id)>=0;return'<div class="card"><div class="row"><strong>'+esc(v.title)+'</strong></div><div class="tags"><span class="tag b">'+fmt(v.pay)+'</span><span class="tag">'+esc(v.meta)+'</span></div>'+(ap?'<span class="tag g" style="align-self:flex-start">Отклик отправлен</span>':'<button class="btn outline sm" style="width:100%" data-act="apply" data-arg="'+v.id+'"'+(j.resume?'':' disabled')+'>'+(j.resume?'Откликнуться':'Сначала соберите резюме')+'</button>')+'</div>';}).join('');
+  return out;
+}
+function emptyGoal(what){return '<div class="card" style="align-items:flex-start"><strong style="font-size:17px">Сначала выберите цель</strong><span class="hint" style="font-size:14px">Чтобы начать '+what+', выберите в Компасе профессию, куда хотите перейти, или «Остаться и усилиться».</span><button class="btn sm" data-act="tab" data-arg="compass">Открыть Компас</button></div>';}
+
+function pushHtml(){if(!S.push)return'';return'<div class="push" role="status"><div class="app"><span></span><span style="flex:1">СберБанк · '+esc(S.push.tag)+'</span><span>сейчас</span></div><strong style="font-size:15px;line-height:1.3">'+esc(S.push.title)+'</strong><span style="font-size:13px;color:var(--ink2)">'+esc(S.push.body)+'</span><div style="display:flex;gap:8px;margin-top:4px"><button class="btn sm" data-act="openPush">Открыть</button><button class="btn sm ghost" data-act="dismissPush">Позже</button></div></div>';}
+function tabsHtml(){const pend=S.agent.filter(a=>a.status==='pending').length;const T=[['home','Главная'],['compass','Компас'],['save','Копилка'],['learn','Обучение'],['job','Работа']];
+  return '<nav class="tabs">'+T.map(t=>'<button class="'+(S.tab===t[0]?'on':'')+'" data-act="tab" data-arg="'+t[0]+'">'+svg(t[0])+t[1]+(t[0]==='home'&&pend?'<span class="dotb"></span>':'')+'</button>').join('')+'</nav>';}
+const HUBTITLE={home:'Карьерный щит',compass:'Компас профессий',save:'Копилка перехода',learn:'Обучение',job:'Работа'};
+
+function renderPhone(){
+  let html;
+  if(S.screen==='input') html='<div class="scroll" id="scroll" style="padding-top:18px">'+vInput()+'</div>';
+  else if(S.screen==='result') html=topbar('Риск замены',true)+'<div class="scroll" id="scroll">'+vResult()+'</div>';
+  else { const V={home:vHome,compass:vCompass,save:vSave,learn:vLearn,job:vJob}; html=topbar(HUBTITLE[S.tab],true)+'<div class="scroll" id="scroll">'+V[S.tab]()+'</div>'+tabsHtml(); }
+  html+=pushHtml();
+  if(S.toast) html+='<div class="toast" id="toast">'+esc(S.toast).replace(/^(\+\d+)/,'<b>$1</b>')+'</div>';
+  const ph=document.getElementById('phone'); const sc=document.getElementById('scroll'); const keep=sc?sc.scrollTop:0; const same=ph.dataset.view===(S.screen+S.tab);
+  ph.innerHTML=html; ph.dataset.view=S.screen+S.tab;
+  if(same){const n=document.getElementById('scroll');if(n)n.scrollTop=keep;}
+}
+const TRIG=[
+ ['week','Каждую неделю','Прошла неделя','Агент готовит 3 шага, урок ждёт — клиент заходит.'],
+ ['salary','2 раза в месяц','Пришла зарплата','Копилка пополняется сама — видно, как растёт.'],
+ ['market','Раз в месяц','Новые вакансии','Рынок целевой профессии в его городе.'],
+ ['risk','Раз в квартал','Пересчёт риска','Модель обновилась — риск и срок сдвинулись.']
+];
+const isDemo=()=>location.hash==='#demo';
+function renderPanel(){const pn=document.getElementById('panel');pn.hidden=!isDemo();if(!isDemo())return;
+  const s=score(); const price=S.learn.started?coursePrice():0;
+  document.getElementById('panel').innerHTML=
+   '<span class="eyebrow" style="letter-spacing:.08em">Прототип · Доход, устойчивый к ИИ</span><h2>Почему клиент не уходит</h2>'+
+   '<p>Клиент проверяет риск, получает защищённость в баллах и 4 раздела, где каждый шаг — действие в Сбере. Нажимайте события, чтобы прожить месяцы за минуту.</p>'+
+   '<div class="grid2">'+TRIG.map(t=>'<button class="trig" data-act="fire" data-arg="'+t[0]+'"><span class="f">'+t[1]+'</span><span class="l">'+t[2]+'</span><span class="w">'+t[3]+'</span></button>').join('')+'</div>'+
+   '<strong style="font-size:15px">Что получает банк — живые цифры демо</strong>'+
+   '<div class="kpis">'+
+    '<div class="kpi"><span>Защищённость клиента</span><b>'+s+'/100</b></div>'+
+    '<div class="kpi"><span>Возвратов в приложение</span><b>'+S.returns+'</b></div>'+
+    '<div class="kpi"><span>Остатки в копилке</span><b>'+fmt(S.save.balance)+'</b></div>'+
+    '<div class="kpi"><span>Образовательный кредит</span><b>'+(price?fmt(price):'—')+'</b></div>'+
+    '<div class="kpi"><span>Страховка дохода</span><b>'+(S.save.insurance?'590 ₽/мес':'—')+'</b></div>'+
+    '<div class="kpi"><span>Зарплата при смене работы</span><b>'+(S.job.salaryMoved?'Осталась в Сбере':(S.job.offer?'Решается':'—'))+'</b></div>'+
+   '</div>'+
+   '<div class="card"><div class="row"><strong>Лента событий</strong><button class="chip" style="height:36px" data-act="reset">Сбросить демо</button></div>'+
+   (S.log.length?S.log.map(l=>'<div class="log"><b>'+esc(l.tag)+'</b><span>'+esc(l.text)+'</span></div>').join(''):'<span class="hint">Пока пусто. Введите профессию в телефоне.</span>')+'</div>';
+}
+function render(focus){renderPhone();renderPanel();const inp=document.getElementById('prof-input');if(inp&&focus&&window.matchMedia('(min-width: 901px)').matches){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}}
+function goScreen(sc,tab){S.screen=sc;if(tab)S.tab=tab;S.push=null;render(sc==='input');const n=document.getElementById('scroll');if(n)n.scrollTop=0;}
+
+function openResult(k){S.occ=k;if(k!=='custom')S.query=O[k].name;S.target=null;S.bump=0;S.notFound=false;S.shared=false;
+  S.save={on:false,pct:8,roundup:false,balance:0,insurance:false};S.learn={started:false,done:0,streak:0};S.job={resume:false,applied:[],invited:false,prepared:false,offer:false,salaryMoved:false};S.agent=[];
+  addLog('Проверка','«'+O[k].name+'»: риск за 10 лет '+risk(O[k],0).p2036+'%');S.anim=true;goScreen('result');runReveal();}
+function hueCol(v){const h=140-135*Math.min(1,v/100);return 'hsl('+h+',78%,64%)';}
+function runReveal(){
+  const r=risk(occ(),S.bump),target=r.p2036,scores=['Анализируем задачи профессии…','Сравниваем с возможностями ИИ…','Считаем по годам…'];
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const num=document.getElementById('bigNum'),arc=document.getElementById('garc'),nd=document.getElementById('gneedle'),sc=document.getElementById('scanTxt'),pl=document.getElementById('pills');
+  const finish=()=>{S.anim=false;if(num){num.textContent=target+'%';num.style.color=hueCol(target);num.classList.add('pop');}if(arc)arc.setAttribute('stroke-dasharray',target+' 100');if(nd)nd.setAttribute('transform','rotate('+(-90+target*1.8)+' 100 100)');if(sc)sc.textContent='';if(pl)pl.classList.remove('pre');};
+  if(reduce||!num){finish();return;}
+  let si=0;const tick=setInterval(()=>{si++;if(sc&&si<scores.length)sc.textContent=scores[si];},420);
+  const dur=1500,t0=performance.now();
+  const step=now=>{if(!document.getElementById('bigNum')){clearInterval(tick);S.anim=false;return;}
+    const k=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-k,3);
+    const jitter=k<0.85?(Math.sin(now/40)*3*(1-k)):0;
+    const v=Math.max(0,Math.min(100,target*e+jitter));
+    num.textContent=Math.round(v)+'%';num.style.color=hueCol(v);
+    arc.setAttribute('stroke-dasharray',v.toFixed(1)+' 100');nd.setAttribute('transform','rotate('+(-90+v*1.8)+' 100 100)');
+    if(k<1)requestAnimationFrame(step);else{clearInterval(tick);finish();}};
+  requestAnimationFrame(step);
+}
+function doCalc(){if(norm(S.query).length<2){S.notFound=true;const nf0=document.getElementById('nf');if(nf0)nf0.hidden=false;return;}const m=match(S.query);if(m.length===1)return openResult(m[0]);if(m.length>1){const ex=m.find(k=>norm(O[k].name)===norm(S.query));if(ex)return openResult(ex);const n=norm(S.query);const sc=k=>Math.max(norm(O[k].name)===n?2000:0,...O[k].kw.map(w=>{const nw=norm(w);return nw===n?1000:(n.indexOf(nw)>=0?nw.length:0);}));const best=m.slice().sort((a,b)=>sc(b)-sc(a))[0];return openResult(best);}return openResult(makeCustom(S.query));
+  const nf=document.getElementById('nf');if(nf)nf.hidden=!S.notFound;const sg=document.getElementById('sugg');if(sg)sg.innerHTML=suggestHtml();}
+
+function ensureBasics(){ if(!S.occ){S.occ='buh';} if(S.screen==='input'||S.screen==='result'){S.screen='hub';} if(!S.target){const r=risk(occ(),S.bump);S.target=(tierOf(r)==='low'&&!occ().special)?'stay':occ().targets[0].key;} if(!S.save.on) S.save.on=true; if(!S.agent.length) S.agent=agentSet(0); }
+function fire(kind){
+  mutate(()=>{
+    ensureBasics(); let p;
+    if(kind==='week'){S.agentWeek=(S.agentWeek+1)%3;S.agent=agentSet(S.agentWeek);S.weeks++;
+      p={tag:'Неделя',title:'Агент подготовил 3 шага, урок '+Math.min(S.learn.done+1,LESSONS)+' ждёт',body:'Подтвердите шаги и пройдите урок — защищённость вырастет. Без вашего «да» агент ничего не делает.',tab:'home'};}
+    else if(kind==='salary'){const add=Math.round(income()*S.save.pct/100/10)*10+(S.save.roundup?600:0);S.save.balance+=add;const ct=cushionTarget();
+      p={tag:occ().special?'Доход':'Зарплата',title:(occ().special?'Пришла '+incomeName()+' ':'Пришла зарплата ')+fmt(income()),body:fmt(add)+' ушло в копилку перехода. Там уже '+fmt(S.save.balance)+' — '+Math.min(100,Math.round(S.save.balance/ct*100))+'% подушки.',tab:'save'};}
+    else if(kind==='market'){const v=vacancies()[0];p={tag:'Рынок',title:'+18 вакансий «'+goalName()+'» за месяц',body:'Лучшая: '+v.title+', '+fmt(v.pay)+'. Откликнитесь, пока работаете.',tab:'job'};}
+    else if(kind==='risk'){const b=risk(occ(),S.bump),a=risk(occ(),S.bump+0.04);S.bump+=0.04;p={tag:'Пересчёт риска',title:'«'+occ().name+'»: риск за 10 лет '+b.p2036+'% → '+a.p2036+'%',body:(a.t50>20?'Точка 50% пока далеко — позже 2046 года. Но доля рутинных задач растёт: ваш трек актуален.':'Точка 50%: '+(b.t50>20?'позже 2046':monthLabel(Math.round(b.t50*12)))+' → '+monthLabel(Math.round(a.t50*12))+'. Проверьте, успевает ли ваш трек.'),tab:'home'};}
+    S.push=p;addLog(p.tag,p.title);
+  });
+}
+
+const ACT={
+ back:()=>{ if(S.screen==='result') goScreen('input'); else if(S.screen==='hub'&&S.tab!=='home'){S.tab='home';goScreen('hub');} else goScreen('result'); },
+ calc:()=>doCalc(), pick:k=>openResult(k),
+ toHub:()=>{goScreen('hub','home');}, toHubTab:k=>goScreen('hub',k),
+ tab:k=>{ if(S.screen!=='hub') S.screen='hub'; S.tab=k; S.push=null; render(false); const n=document.getElementById('scroll'); if(n) n.scrollTop=0; },
+ cfilter:k=>{S.compassFilter=k;render(false);},
+ setTarget:k=>mutate(()=>{const first=!S.target;S.target=k;S.learn={started:false,done:0,streak:0};if(!S.agent.length)S.agent=agentSet(0);addLog('Цель',goalName());if(first)S.tab='home';},{toast:'Цель: '+(k==='stay'?'остаться и усилиться':O[k].name)}),
+ saveOn:()=>mutate(()=>{S.save.on=true;addLog('Копилка','Включена: 8% с каждой зарплаты');},{toast:'Копилка включена'}),
+ saveToggle:()=>mutate(()=>{S.save.on=!S.save.on;},{toast:S.save.on?'Отчисления на паузе':'Отчисления включены'}),
+ savePct:v=>mutate(()=>{S.save.pct=+v;S.save.on=true;},{toast:'Отчисления: '+v+'% с зарплаты'}),
+ roundup:()=>mutate(()=>{S.save.roundup=!S.save.roundup;},{toast:'Округление покупок '+(S.save.roundup?'выключено':'включено')}),
+ insurance:()=>mutate(()=>{S.save.insurance=!S.save.insurance;if(S.save.insurance)addLog('Страховка','Страховка дохода подключена');}),
+ topup:v=>mutate(()=>{S.save.balance+=+v;S.save.on=true;addLog('Копилка','Пополнение '+fmt(+v));}),
+ startLearn:()=>mutate(()=>{S.learn.started=true;addLog('Обучение','Курс «'+goalName()+'» — образовательный кредит '+fmt(coursePrice()));}),
+ lesson:()=>mutate(()=>{S.learn.done=Math.min(LESSONS,S.learn.done+1);S.learn.streak=Math.max(S.learn.streak,1)+(S.learn.done>1?1:0);addLog('Урок',S.learn.done+' из '+LESSONS);}),
+ resume:()=>mutate(()=>{S.job.resume=true;addLog('Резюме','Агент собрал резюме под «'+goalName()+'»');}),
+ apply:id=>mutate(()=>{if(S.job.applied.indexOf(id)<0)S.job.applied.push(id);addLog('Отклик','Отправлен');if(S.job.applied.length>=2&&!S.job.invited){S.job.invited=true;S.push={tag:'Работа',title:'Вас пригласили на собеседование',body:'Пятница, 15:00. Пройдите тренировку с ИИ-интервьюером — 15 минут.',tab:'job'};addLog('Работа','Приглашение на собеседование');}}),
+ prepare:()=>mutate(()=>{S.job.prepared=true;addLog('Тренировка','ИИ-интервьюер: 8 из 10');}),
+ interview:()=>mutate(()=>{S.job.offer=true;addLog('Оффер','Переход до точки риска');}),
+ moveSalary:()=>mutate(()=>{S.job.salaryMoved=true;addLog('Удержание','Новая зарплата будет приходить в Сбер');},{toast:'Зарплата остаётся в Сбере'}),
+ approve:id=>agentAct(id,'done'), decline:id=>agentAct(id,'declined'),
+ share:()=>{const r=risk(occ(),S.bump);const text='Мой риск замены ИИ — «'+occ().name+'»: '+r.p2036+'% за 10 лет. Проверь свою профессию в СберБанк Онлайн';try{navigator.clipboard.writeText(text).catch(()=>{});}catch(e){}S.shared=true;addLog('Поделился','Друг проверит свою профессию в Сбере');render(false);},
+ openPush:()=>{const t=S.push&&S.push.tab;S.returns++;S.push=null;S.screen='hub';S.tab=t||'home';render(false);const n=document.getElementById('scroll');if(n)n.scrollTop=0;},
+ dismissPush:()=>{S.push=null;render(false);},
+ fire:k=>fire(k),
+ reset:()=>{S=initial();render(true);}
+};
+function agentAct(id,status){mutate(()=>{const a=S.agent.find(x=>x.id===id);if(!a)return;a.status=status;if(status==='done'){S.agentSaved+=a.saving;if(/резюме/i.test(a.text))S.job.resume=true;}addLog('Агент',(status==='done'?'Подтверждено: ':'Отклонено: ')+a.text);},{toast:status==='done'?'Агент сделал':'Агент учтёт'});}
+
+document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||el.disabled)return;const f=ACT[el.dataset.act];if(f)f(el.dataset.arg);});
+document.addEventListener('input',e=>{if(e.target.id!=='prof-input')return;S.query=e.target.value;S.notFound=false;const nf=document.getElementById('nf');if(nf)nf.hidden=true;const sg=document.getElementById('sugg');if(sg)sg.innerHTML=suggestHtml();});
+document.addEventListener('keydown',e=>{if(e.target.id==='prof-input'&&e.key==='Enter'){e.preventDefault();doCalc();}});
+window.addEventListener('hashchange',()=>render(false));
+render(true);
+})();
+</script>
+</body>
+</html>
