@@ -335,7 +335,7 @@ function vTool(k){
   const RATES=[['yes','Да'],['maybe','Возможно'],['no','Нет']];
   let fb;
   if(f.sent){
-    fb='<div class="card"><strong style="font-size:17px">Спасибо, ответ записан</strong><span class="hint" style="font-size:14px">Загляните в другие разделы — там тоже нужен ваш взгляд.</span><button class="btn" data-act="tab" data-arg="home">К другим разделам</button></div>';
+    fb='<div class="card"><strong style="font-size:17px">Спасибо, ответ записан</strong><span class="hint" style="font-size:14px">Загляните в другие разделы — там тоже нужен ваш взгляд.</span><button class="btn" data-act="back">К другим разделам</button></div>';
   } else {
     fb='<div class="card"><strong style="font-size:17px">Стали бы этим пользоваться?</strong>'+
      '<div class="chips">'+RATES.map(r=>'<button class="chip'+(f.rate===r[0]?' on':'')+'" data-act="rate" data-arg="'+k+'|'+r[0]+'">'+r[1]+'</button>').join('')+'</div>'+
@@ -437,9 +437,7 @@ function vResult(){
    '<div class="gauge" id="gauge" data-target="'+r.p2036+'"><svg viewBox="0 0 200 116" width="230" height="134" aria-hidden="true"><defs><linearGradient id="gg" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#3FBF6A"/><stop offset=".5" stop-color="#F2B233"/><stop offset="1" stop-color="#F0584C"/></linearGradient></defs><path d="M16 100 A84 84 0 0 1 184 100" fill="none" stroke="#2E3338" stroke-width="16" stroke-linecap="round"/><path id="garc" d="M16 100 A84 84 0 0 1 184 100" fill="none" stroke="url(#gg)" stroke-width="16" stroke-linecap="round" pathLength="100" stroke-dasharray="'+(S.anim?0:r.p2036)+' 100"/><line id="gneedle" x1="100" y1="100" x2="100" y2="30" stroke="#fff" stroke-width="4" stroke-linecap="round" transform="rotate('+(S.anim?-90:(-90+r.p2036*1.8))+' 100 100)"/><circle cx="100" cy="100" r="8" fill="#fff"/></svg><div class="big" id="bigNum" style="color:'+(S.anim?'#3FBF6A':scoreC)+'">'+(S.anim?0:r.p2036)+'%</div></div><span class="scan" id="scanTxt">'+(S.anim?'Анализируем задачи профессии…':'')+'</span><span style="color:#D0D5D9;font-size:14px">вероятность, что ИИ заберёт бо́льшую часть работы в ближайшие 10 лет</span><span style="color:#9AA1A7;font-size:13px">к 2031 — '+r.p2031+'%</span>'+
    '<div class="pills'+(S.anim?' pre':'')+'" id="pills"><span class="pill" style="background:'+tierBg+';color:'+riskCol(r.p2036)+'">'+tierLabel+'</span><span class="pill" style="background:var(--dark2);color:#fff">Точка 50%: '+when+'</span></div></div>'+
   '<div class="card"><span class="eyebrow" style="color:'+riskCol(r.p2036)+'">Вердикт</span><div>'+esc(verdict)+'</div></div>'+
-  '<div class="next" style="background:var(--dark)"><span style="font-size:13px;color:#B8BFC4">Ваша защищённость сейчас</span><div class="row"><strong style="font-size:28px">'+sc0+'/100</strong><span class="pill" style="background:#3A1F1D;color:#FF8A80">Уязвим</span></div><div class="track" style="background:#2E3338"><i style="width:'+sc0+'%;background:#FF8A80"></i></div><span style="font-size:14px;color:#D0D5D9">Ниже — четыре инструмента, которые помогут её поднять.</span></div>'+
-  '<strong style="font-size:17px;padding:4px 4px 0">Что поможет защитить ваш доход</strong>'+toolGrid('result')+
-  '<button class="btn" data-act="toHub" style="height:56px">Защитить свой доход</button>'+
+  '<div id="tools" style="padding:4px 4px 0;display:flex;flex-direction:column;gap:4px"><strong style="font-size:17px">Что поможет защитить ваш доход</strong><span class="hint" style="font-size:14px">Откройте разделы, которые вам интересны, и оставьте отзыв</span></div>'+toolGrid('result')+
   '<div class="card"><strong>Вероятность по годам</strong><div class="bars'+(S.anim?' grow':'')+'">'+r.bars.map((b,i)=>'<div class="bar"><em style="animation-delay:'+(1.6+i*0.08)+'s">'+b.p+'</em><i style="height:'+b.h+'px;background:'+riskCol(b.p)+';animation-delay:'+(1.5+i*0.08)+'s"></i><small>'+b.y+'</small></div>').join('')+'</div></div>'+
   (o.special?'':'<div class="card"><strong>Что уйдёт к ИИ первым</strong>'+byW.map(t=>'<div style="display:flex;flex-direction:column;gap:6px"><div class="row" style="font-size:14px"><span>'+esc(t.name)+'</span><b style="color:'+riskCol(t.w)+'">'+t.w+'%</b></div><div class="track"><i style="width:'+t.w+'%;background:'+riskCol(t.w)+'"></i></div></div>').join('')+'</div>')+
   '<button class="btn ghost" data-act="share">Поделиться результатом</button>'+(S.shared?'<p class="hint" style="text-align:center;color:var(--green)">Ссылка скопирована. Друг проверит свою профессию — в Сбере.</p>':'')+
@@ -619,7 +617,7 @@ function fire(kind){
 }
 
 const ACT={
- back:()=>{ if(S.screen==='result') goScreen('input'); else if(S.screen==='hub'&&S.tab!=='home'){S.tab='home';goScreen('hub');} else goScreen('result'); },
+ back:()=>{ if(S.screen==='result') goScreen('input'); else if(S.screen==='hub'){S.tab='home';S.screen='result';S.push=null;render(false);const t=document.getElementById('tools'),n=document.getElementById('scroll');if(t&&n)n.scrollTop=t.offsetTop-12;} else goScreen('result'); },
  calc:()=>doCalc(), pick:k=>openResult(k),
  toHub:()=>{goScreen('hub','home');}, toHubTab:k=>goScreen('hub',k),
  tab:k=>{ if(S.screen!=='hub') S.screen='hub'; S.tab=k; S.push=null; render(false); const n=document.getElementById('scroll'); if(n) n.scrollTop=0; },
