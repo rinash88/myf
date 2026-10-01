@@ -76,8 +76,19 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .tag.b{background:var(--blueSoft);color:var(--blue)}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .tile{background:var(--card);border:0;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:6px;text-align:left;min-height:108px}
-.tile:hover{box-shadow:0 0 0 2px var(--green) inset}
+@media (hover:hover){.tile:hover{box-shadow:0 0 0 2px var(--line) inset}}
 .tile .t{font-weight:800;font-size:15px}
+/* test: 4 равнозначные плитки */
+.ttile{min-height:168px;gap:8px;justify-content:flex-start}
+.ttile .ic{width:40px;height:40px;border-radius:20px;background:var(--greenSoft);display:flex;align-items:center;justify-content:center}
+.ttile .t{font-size:16px;line-height:1.2}
+.ttile .hint{font-size:13px;line-height:1.35;flex:1}
+.ttile .more{font-size:13px;font-weight:600;color:var(--ink2)}
+.feat{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #ECEFEA}
+.feat:last-child{border-bottom:0}
+.feat .n{width:28px;height:28px;border-radius:14px;background:var(--greenSoft);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+.ta{width:100%;min-height:96px;border-radius:14px;border:1px solid var(--line);padding:12px;font:inherit;font-size:15px;resize:vertical;background:#fff;color:var(--ink)}
+.ta:focus{outline:2px solid var(--green2);border-color:transparent}
 .ring{width:108px;height:108px;border-radius:54px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .5s}
 .ring>div{width:84px;height:84px;border-radius:42px;background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center}
 .next{background:var(--green);color:#fff;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;border:0;text-align:left}
@@ -282,8 +293,60 @@ function initial(){return{anim:false,screen:'input',tab:'home',query:'',occ:null
   save:{on:false,pct:8,roundup:false,balance:0,insurance:false},
   learn:{started:false,done:0,streak:0},
   job:{resume:false,applied:[],invited:false,prepared:false,offer:false,salaryMoved:false},
-  agent:[],agentWeek:0,agentSaved:0,push:null,toast:null,returns:0,log:[],weeks:0};}
+  agent:[],agentWeek:0,agentSaved:0,push:null,toast:null,returns:0,log:[],weeks:0,fb:{}};}
 let S=initial();
+
+/* ---------- ТЕСТ СПРОСА: 4 инструмента ----------
+   YM_ID — номер счётчика Яндекс Метрики. Пока 0 — события пишутся только в консоль. */
+const YM_ID=0;
+if(YM_ID){(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,'script','https://mc.yandex.ru/metrika/tag.js','ym');
+  ym(YM_ID,'init',{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});}
+const TOOLS={
+ compass:{name:'Компас профессий',sub:'Узнайте, какие профессии будут нужны через 10 лет',
+  feats:[['Прогноз спроса на 10 лет','Какие профессии будут расти, а какие сокращаться'],['Подбор под ваш опыт','Профессии, где пригодится то, что вы уже умеете'],['Сравнение вариантов','Риск замены ИИ, зарплата и срок переобучения рядом']]},
+ save:{name:'Копилка на переход',sub:'Накопите запас денег на время смены работы',
+  feats:[['Цель под переход','Сумма на несколько месяцев ваших обычных расходов'],['Автопополнение','Небольшой процент с каждой зарплаты — без усилий'],['Прогресс и срок','Видно, сколько уже собрано и когда хватит на переход']]},
+ learn:{name:'Обучение профессии',sub:'Освойте новую профессию на коротком курсе',
+  feats:[['Курсы под профессию','Короткие программы с практикой на реальных задачах'],['Оплата частями','Платите понемногу, пока учитесь, а не всё сразу'],['Сертификат в резюме','Подтверждение новых навыков для работодателя']]},
+ job:{name:'Поиск работы',sub:'Найдите работу, где риск замены ИИ ниже',
+  feats:[['Резюме под новую роль','Ваш опыт, переведённый на язык новой профессии'],['Подбор вакансий','Предложения по выбранной профессии в вашем городе'],['Тренировка собеседования','Репетиция с ИИ-интервьюером перед встречей']]}
+};
+/* порядок плиток случайный для каждого респондента — снимает эффект «первой плитки» */
+const ORDER=(()=>{const a=Object.keys(TOOLS);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;})();
+const SID=Math.random().toString(36).slice(2,10);
+let opened=[];
+function track(event,data){
+  const d=data||{},occName=S.occ?O[S.occ].name:'';
+  let goal=event,params={test_order:ORDER.join(','),profession:occName};
+  if(event==='result'){params.risk=d.risk;}
+  if(event==='open_tool'){goal='open_'+d.tool;params[d.name]={opened:true,position:d.pos,source:d.src,nth:d.nth};
+    if(d.nth===1&&d.first_visit){params.first_tool=d.name;params.first_tool_position=d.pos;ymGoal('first_'+d.tool,params);}}
+  if(event==='feedback'){goal='fb_'+d.tool+'_'+d.rate;params[d.name]={rate:d.rate,comment:d.comment||'—',position:d.pos};}
+  console.log('[test]',goal,params);
+  ymGoal(goal,params);
+}
+function ymGoal(goal,params){if(YM_ID&&window.ym){try{ym(YM_ID,'reachGoal',goal,params);}catch(e){}}}
+function toolTile(k,src){const t=TOOLS[k],done=S.fb[k]&&S.fb[k].sent;
+  return '<button class="tile ttile" data-act="openTool" data-arg="'+k+'|'+src+'"><span class="ic">'+svg(k,'#137A3F')+'</span><span class="t">'+t.name+'</span><span class="hint">'+t.sub+'</span><span class="more">'+(done?'Ответ отправлен':'Подробнее →')+'</span></button>';}
+function toolGrid(src){return '<div class="grid2">'+ORDER.map(k=>toolTile(k,src)).join('')+'</div>';}
+function vTool(k){
+  const t=TOOLS[k],f=S.fb[k]||(S.fb[k]={rate:'',comment:'',sent:false});
+  const RATES=[['yes','Да'],['maybe','Возможно'],['no','Нет']];
+  let fb;
+  if(f.sent){
+    fb='<div class="card"><strong style="font-size:17px">Спасибо, ответ записан</strong><span class="hint" style="font-size:14px">Загляните в другие разделы — там тоже нужен ваш взгляд.</span><button class="btn" data-act="tab" data-arg="home">К другим разделам</button></div>';
+  } else {
+    fb='<div class="card"><strong style="font-size:17px">Стали бы этим пользоваться?</strong>'+
+     '<div class="chips">'+RATES.map(r=>'<button class="chip'+(f.rate===r[0]?' on':'')+'" data-act="rate" data-arg="'+k+'|'+r[0]+'">'+r[1]+'</button>').join('')+'</div>'+
+     '<label for="fb-comment" class="hint" style="font-size:14px;color:var(--ink2)">Что вы хотели бы здесь видеть? Чего не хватает?</label>'+
+     '<textarea id="fb-comment" class="ta" data-k="'+k+'" placeholder="Необязательно">'+esc(f.comment)+'</textarea>'+
+     '<button class="btn" data-act="sendFb" data-arg="'+k+'"'+(f.rate?'':' disabled')+'>Отправить</button></div>';
+  }
+  return '<div class="card" style="gap:12px"><span class="ic" style="width:48px;height:48px;border-radius:24px;background:var(--greenSoft);display:flex;align-items:center;justify-content:center">'+svg(k,'#137A3F')+'</span><strong style="font-size:22px;line-height:1.15">'+t.name+'</strong><span style="font-size:15px;color:var(--ink2)">'+t.sub+'</span></div>'+
+   '<div class="card" style="gap:0"><span class="eyebrow" style="padding-bottom:4px">Что здесь будет</span>'+t.feats.map((x,i)=>'<div class="feat"><span class="n">'+(i+1)+'</span><div style="display:flex;flex-direction:column;gap:2px"><span style="font-weight:700">'+x[0]+'</span><span class="hint" style="font-size:14px">'+x[1]+'</span></div></div>').join('')+'</div>'+
+   fb+
+   '<p class="hint" style="padding:0 4px">Раздел готовим. Ваш ответ поможет решить, что сделать первым.</p>';
+}
 
 function occ(){return O[S.occ||'buh'];}
 function tgt(){return S.target&&S.target!=='stay'&&O[S.target]&&!O[S.target].special?O[S.target]:null;}
@@ -364,7 +427,7 @@ function vResult(){
   const tierLabel=tier==='high'?'Высокий риск':(tier==='mid'?'Средний риск':'Низкий риск');
   const tierBg=tier==='high'?'var(--redSoft)':(tier==='mid'?'var(--amberSoft)':'var(--greenSoft)');
   const scoreC=hueCol(r.p2036);
-  const verdict=o.special?(o.key==='jobless'?'ИИ нечего у вас забрать — а вот помочь он может. Подберём профессию, где риск замены низкий, дадим короткое обучение в рассрочку и найдём работу. Копилка поможет продержаться, пока ищете.':'Хорошая новость: вы выбираете профессию сейчас, когда уже видно, какие работы заберёт ИИ. Компас покажет, куда идти, чтобы через 10 лет быть востребованным.'):(o.custom?'Точной профессии нет в базе — оценили по похожим задачам. ':'')+(tier==='high'?'ИИ уже уверенно делает «'+top.name+'» — около '+top.w+'% этой части работы. Профессию не отменят за один день, но людей в ней будут сокращать раньше: переходить лучше заранее, пока есть доход.'
+  const verdict=o.special?(o.key==='jobless'?'ИИ нечего у вас забрать — а вот помочь он может: найти профессию, где риск замены низкий, и путь в неё.':'Хорошая новость: вы выбираете профессию сейчас, когда уже видно, какие работы заберёт ИИ.'):(o.custom?'Точной профессии нет в базе — оценили по похожим задачам. ':'')+(tier==='high'?'ИИ уже уверенно делает «'+top.name+'» — около '+top.w+'% этой части работы. Профессию не отменят за один день, но людей в ней будут сокращать раньше: переходить лучше заранее, пока есть доход.'
    :(tier==='mid'?'ИИ заберёт рутину — «'+top.name+'», но «'+human.name+'» останется за человеком. Кто освоит ИИ-инструменты, станет ценнее; кто нет — будет конкурировать с ИИ по цене.'
    :'Работа руками и с людьми: ИИ здесь помощник, а не замена. «'+human.name+'» останется за вами надолго. Рутину вроде «'+top.name+'» можно отдать ИИ уже сейчас.'));
   const others=POPULAR.filter(k=>k!==o.key).slice(0,6);
@@ -373,9 +436,8 @@ function vResult(){
    '<div class="gauge" id="gauge" data-target="'+r.p2036+'"><svg viewBox="0 0 200 116" width="230" height="134" aria-hidden="true"><defs><linearGradient id="gg" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#3FBF6A"/><stop offset=".5" stop-color="#F2B233"/><stop offset="1" stop-color="#F0584C"/></linearGradient></defs><path d="M16 100 A84 84 0 0 1 184 100" fill="none" stroke="#2E3338" stroke-width="16" stroke-linecap="round"/><path id="garc" d="M16 100 A84 84 0 0 1 184 100" fill="none" stroke="url(#gg)" stroke-width="16" stroke-linecap="round" pathLength="100" stroke-dasharray="'+(S.anim?0:r.p2036)+' 100"/><line id="gneedle" x1="100" y1="100" x2="100" y2="30" stroke="#fff" stroke-width="4" stroke-linecap="round" transform="rotate('+(S.anim?-90:(-90+r.p2036*1.8))+' 100 100)"/><circle cx="100" cy="100" r="8" fill="#fff"/></svg><div class="big" id="bigNum" style="color:'+(S.anim?'#3FBF6A':scoreC)+'">'+(S.anim?0:r.p2036)+'%</div></div><span class="scan" id="scanTxt">'+(S.anim?'Анализируем задачи профессии…':'')+'</span><span style="color:#D0D5D9;font-size:14px">вероятность, что ИИ заберёт бо́льшую часть работы в ближайшие 10 лет</span><span style="color:#9AA1A7;font-size:13px">к 2031 — '+r.p2031+'%</span>'+
    '<div class="pills'+(S.anim?' pre':'')+'" id="pills"><span class="pill" style="background:'+tierBg+';color:'+riskCol(r.p2036)+'">'+tierLabel+'</span><span class="pill" style="background:var(--dark2);color:#fff">Точка 50%: '+when+'</span></div></div>'+
   '<div class="card"><span class="eyebrow" style="color:'+riskCol(r.p2036)+'">Вердикт</span><div>'+esc(verdict)+'</div></div>'+
-  '<div class="next" style="background:var(--dark)"><span style="font-size:13px;color:#B8BFC4">Ваша защищённость сейчас</span><div class="row"><strong style="font-size:28px">'+sc0+'/100</strong><span class="pill" style="background:#3A1F1D;color:#FF8A80">Уязвим</span></div><div class="track" style="background:#2E3338"><i style="width:'+sc0+'%;background:#FF8A80"></i></div><span style="font-size:14px;color:#D0D5D9">Поднимите её до 80+ за 4 шага. Каждый шаг — реальное действие в Сбере.</span></div>'+
-  '<div class="grid2">'+
-   [['compass','Компас','Куда перейти с вашим опытом'],['save','Копилка','Подушка на время перехода'],['learn','Обучение','Курс с оплатой частями'],['job','Работа','Резюме, отклики, оффер']].map(x=>'<button class="tile" data-act="toHubTab" data-arg="'+x[0]+'">'+svg(x[0],'#137A3F')+'<span class="t">'+x[1]+'</span><span class="hint">'+x[2]+'</span></button>').join('')+'</div>'+
+  '<div class="next" style="background:var(--dark)"><span style="font-size:13px;color:#B8BFC4">Ваша защищённость сейчас</span><div class="row"><strong style="font-size:28px">'+sc0+'/100</strong><span class="pill" style="background:#3A1F1D;color:#FF8A80">Уязвим</span></div><div class="track" style="background:#2E3338"><i style="width:'+sc0+'%;background:#FF8A80"></i></div><span style="font-size:14px;color:#D0D5D9">Ниже — четыре инструмента, которые помогут её поднять.</span></div>'+
+  '<strong style="font-size:17px;padding:4px 4px 0">Что поможет защитить ваш доход</strong>'+toolGrid('result')+
   '<button class="btn" data-act="toHub" style="height:56px">Защитить свой доход</button>'+
   '<div class="card"><strong>Вероятность по годам</strong><div class="bars'+(S.anim?' grow':'')+'">'+r.bars.map((b,i)=>'<div class="bar"><em style="animation-delay:'+(1.6+i*0.08)+'s">'+b.p+'</em><i style="height:'+b.h+'px;background:'+riskCol(b.p)+';animation-delay:'+(1.5+i*0.08)+'s"></i><small>'+b.y+'</small></div>').join('')+'</div></div>'+
   (o.special?'':'<div class="card"><strong>Что уйдёт к ИИ первым</strong>'+byW.map(t=>'<div style="display:flex;flex-direction:column;gap:6px"><div class="row" style="font-size:14px"><span>'+esc(t.name)+'</span><b style="color:'+riskCol(t.w)+'">'+t.w+'%</b></div><div class="track"><i style="width:'+t.w+'%;background:'+riskCol(t.w)+'"></i></div></div>').join('')+'</div>')+
@@ -396,14 +458,8 @@ function vHome(){
     '<div style="display:flex;justify-content:space-between;font-size:12px;color:#9AA1A7">'+LEVELS.map(l=>'<span style="color:'+(s>=l[0]?l[2]:'#6B7278')+'">'+l[1]+'</span>').join('')+'</div>'+
     '<div class="track" style="background:#2E3338"><i style="width:'+s+'%;background:'+L.color+'"></i></div>'+
     '<span style="font-size:13px;color:#B8BFC4">Риск «'+esc(occ().name)+'» за 10 лет: <b style="color:#fff">'+r.p2036+'%</b>'+(S.target?' · цель: <b style="color:#fff">'+esc(goalName())+'</b>':'')+'</span></div>'+
-  '<button class="next" data-act="'+ns.act+'" data-arg="'+ns.arg+'"><span style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.85">Следующий шаг'+(ns.pts?' · +'+ns.pts:'')+'</span><strong style="font-size:18px">'+esc(ns.t)+'</strong><span style="font-size:14px;opacity:.9">'+esc(ns.d)+'</span></button>'+
-  '<div class="grid2">'+
-   tile('compass','Компас',S.target?esc(goalName()):'Цель не выбрана',S.target?100:0,S.target?'Есть цель':'Выбрать')+
-   tile('save','Копилка',S.save.on?fmt(S.save.balance)+' из '+fmt(ct):'Выключена',savePct,S.save.on?savePct+'%':'Включить')+
-   tile('learn','Обучение',S.learn.started?S.learn.done+' из '+LESSONS+' уроков':'Не начато',Math.round(S.learn.done/LESSONS*100),S.learn.started?Math.round(S.learn.done/LESSONS*100)+'%':'Начать')+
-   tile('job','Работа',j.offer?'Оффер получен':(j.invited?'Приглашение':(j.applied.length?'Откликов: '+j.applied.length:(j.resume?'Резюме готово':'Резюме нет'))),jobPct,jobPct+'%')+
-  '</div>'+
-  (S.target?agentCard(pend):'');
+  '<div style="padding:6px 4px 0;display:flex;flex-direction:column;gap:4px"><strong style="font-size:17px">Что поможет защитить ваш доход</strong><span class="hint" style="font-size:14px">Откройте разделы, которые вам интересны, и оставьте отзыв</span></div>'+
+  toolGrid('home');
 }
 function tile(k,t,sub,pct,badge){return '<button class="tile" data-act="tab" data-arg="'+k+'"><div class="row">'+svg(k,'#137A3F')+'<span class="tag g">'+badge+'</span></div><span class="t">'+t+'</span><span class="hint">'+sub+'</span><div class="track"><i style="width:'+pct+'%;background:var(--green2)"></i></div></button>';}
 function agentCard(pend){
@@ -488,7 +544,7 @@ function renderPhone(){
   let html;
   if(S.screen==='input') html='<div class="scroll" id="scroll" style="padding-top:18px">'+vInput()+'</div>';
   else if(S.screen==='result') html=topbar('Риск замены',true)+'<div class="scroll" id="scroll">'+vResult()+'</div>';
-  else { const V={home:vHome,compass:vCompass,save:vSave,learn:vLearn,job:vJob}; html=topbar(HUBTITLE[S.tab],true)+'<div class="scroll" id="scroll">'+V[S.tab]()+'</div>'+tabsHtml(); }
+  else { html=topbar(S.tab==='home'?'Карьерный щит':TOOLS[S.tab].name,true)+'<div class="scroll" id="scroll">'+(S.tab==='home'?vHome():vTool(S.tab))+'</div>'; }
   html+=pushHtml();
   if(S.toast) html+='<div class="toast" id="toast">'+esc(S.toast).replace(/^(\+\d+)/,'<b>$1</b>')+'</div>';
   const ph=document.getElementById('phone'); const sc=document.getElementById('scroll'); const keep=sc?sc.scrollTop:0; const same=ph.dataset.view===(S.screen+S.tab);
@@ -501,7 +557,7 @@ const TRIG=[
  ['market','Раз в месяц','Новые вакансии','Рынок целевой профессии в его городе.'],
  ['risk','Раз в квартал','Пересчёт риска','Модель обновилась — риск и срок сдвинулись.']
 ];
-const isDemo=()=>location.hash==='#demo';
+const isDemo=()=>false;
 function renderPanel(){const pn=document.getElementById('panel');pn.hidden=!isDemo();if(!isDemo())return;
   const s=score(); const price=S.learn.started?coursePrice():0;
   document.getElementById('panel').innerHTML=
@@ -525,7 +581,7 @@ function goScreen(sc,tab){S.screen=sc;if(tab)S.tab=tab;S.push=null;render(sc==='
 
 function openResult(k){S.occ=k;if(k!=='custom')S.query=O[k].name;S.target=null;S.bump=0;S.notFound=false;S.shared=false;
   S.save={on:false,pct:8,roundup:false,balance:0,insurance:false};S.learn={started:false,done:0,streak:0};S.job={resume:false,applied:[],invited:false,prepared:false,offer:false,salaryMoved:false};S.agent=[];
-  addLog('Проверка','«'+O[k].name+'»: риск за 10 лет '+risk(O[k],0).p2036+'%');S.anim=true;goScreen('result');runReveal();}
+  track('result',{risk:risk(O[k],0).p2036});addLog('Проверка','«'+O[k].name+'»: риск за 10 лет '+risk(O[k],0).p2036+'%');S.anim=true;goScreen('result');runReveal();}
 function hueCol(v){const h=140-135*Math.min(1,v/100);return 'hsl('+h+',78%,64%)';}
 function runReveal(){
   const r=risk(occ(),S.bump),target=r.p2036,scores=['Анализируем задачи профессии…','Сравниваем с возможностями ИИ…','Считаем по годам…'];
@@ -586,12 +642,18 @@ const ACT={
  openPush:()=>{const t=S.push&&S.push.tab;S.returns++;S.push=null;S.screen='hub';S.tab=t||'home';render(false);const n=document.getElementById('scroll');if(n)n.scrollTop=0;},
  dismissPush:()=>{S.push=null;render(false);},
  fire:k=>fire(k),
+ openTool:a=>{const [k,src]=a.split('|');const first=opened.indexOf(k)<0;if(first)opened.push(k);
+   track('open_tool',{tool:k,name:TOOLS[k].name,pos:ORDER.indexOf(k)+1,src,nth:opened.length,first_visit:first});
+   if(S.screen!=='hub')S.screen='hub';S.tab=k;render(false);const n=document.getElementById('scroll');if(n)n.scrollTop=0;},
+ rate:a=>{const [k,r]=a.split('|');S.fb[k].rate=r;render(false);},
+ sendFb:k=>{const f=S.fb[k];if(!f||!f.rate)return;const ta=document.getElementById('fb-comment');if(ta)f.comment=ta.value.trim();f.sent=true;
+   track('feedback',{tool:k,name:TOOLS[k].name,pos:ORDER.indexOf(k)+1,rate:f.rate,comment:f.comment});S.toast='Спасибо!';render(false);setTimeout(()=>{if(S.toast==='Спасибо!'){S.toast=null;const el=document.getElementById('toast');if(el)el.remove();}},1800);},
  reset:()=>{S=initial();render(true);}
 };
 function agentAct(id,status){mutate(()=>{const a=S.agent.find(x=>x.id===id);if(!a)return;a.status=status;if(status==='done'){S.agentSaved+=a.saving;if(/резюме/i.test(a.text))S.job.resume=true;}addLog('Агент',(status==='done'?'Подтверждено: ':'Отклонено: ')+a.text);},{toast:status==='done'?'Агент сделал':'Агент учтёт'});}
 
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||el.disabled)return;const f=ACT[el.dataset.act];if(f)f(el.dataset.arg);});
-document.addEventListener('input',e=>{if(e.target.id!=='prof-input')return;S.query=e.target.value;S.notFound=false;const nf=document.getElementById('nf');if(nf)nf.hidden=true;const sg=document.getElementById('sugg');if(sg)sg.innerHTML=suggestHtml();});
+document.addEventListener('input',e=>{if(e.target.id==='fb-comment'){const f=S.fb[e.target.dataset.k];if(f)f.comment=e.target.value;return;}if(e.target.id!=='prof-input')return;S.query=e.target.value;S.notFound=false;const nf=document.getElementById('nf');if(nf)nf.hidden=true;const sg=document.getElementById('sugg');if(sg)sg.innerHTML=suggestHtml();});
 document.addEventListener('keydown',e=>{if(e.target.id==='prof-input'&&e.key==='Enter'){e.preventDefault();doCalc();}});
 window.addEventListener('hashchange',()=>render(false));
 render(true);
