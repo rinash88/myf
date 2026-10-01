@@ -263,7 +263,7 @@ const CLASSES=[
 ];
 const TPL={office:'Отчёты и документы:85;Переписка и согласования:70;Нестандартные задачи:25;Работа с людьми:15',manual:'Учёт и документы:60;Планирование работ:40;Общение с клиентом:10;Работа руками на объекте:5',creative:'Типовой контент:85;Обработка и монтаж:75;Идея и концепция:25;Работа с заказчиком:20',care:'Документация:70;Планирование:50;Работа с людьми:10;Практическая помощь:5',exec:'Сводки и отчёты:75;Подготовка решений:45;Стратегия:10;Люди и переговоры:5',tech:'Типовой код и скрипты:75;Мониторинг и рутина:70;Архитектура решений:25;Работа с бизнесом:20',expert:'Поиск и анализ документов:80;Типовые заключения:70;Сложные случаи:20;Ответственность и подпись:10',transport:'Маршрут и навигация:80;Управление в типовых условиях:40;Нештатные ситуации:15;Работа с людьми:15',sales:'CRM и отчёты:80;Подбор вариантов:70;Переговоры:15;Доверие клиента:15'};
 function makeCustom(q){
-  const n=norm(q); let c=CLASSES.find(x=>x[0].test(n)); if(!c) c=[null,'office',0.45,1.0,'pm:50,cx:50,aitrain:45',90000];
+  const n=norm(q); let c=CLASSES.find(x=>x[0].test(n)); if(!c) return null;
   const name=q.trim().charAt(0).toUpperCase()+q.trim().slice(1);
   O.custom={key:'custom',name:name,kw:[],e:c[2],s:c[3],tasks:TPL[c[1]].split(';').map(x=>{const p=x.split(':');return{name:p[0],w:+p[1]};}),
     targets:c[4].split(',').map(x=>{const p=x.split(':');return{key:p[0],fit:+p[1]};}),course:6,price:90000,pay:c[5],demand:'→',custom:true};
@@ -319,6 +319,7 @@ function track(event,data){
   const d=data||{},occName=S.occ?O[S.occ].name:'';
   let goal=event,params={test_order:ORDER.join(','),profession:occName};
   if(event==='result'){params.risk=d.risk;}
+  if(event==='not_found'){params.not_found=d.query;}
   if(event==='open_tool'){goal='open_'+d.tool;params[d.name]={opened:true,position:d.pos,source:d.src,nth:d.nth};
     if(d.nth===1&&d.first_visit){params.first_tool=d.name;params.first_tool_position=d.pos;ymGoal('first_'+d.tool,params);}}
   if(event==='feedback'){goal='fb_'+d.tool+'_'+d.rate;params[d.name]={rate:d.rate,comment:d.comment||'—',position:d.pos};}
@@ -406,7 +407,7 @@ const IC={
 const svg=(k,c)=>'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="'+(c||'currentColor')+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+IC[k]+'</svg>';
 function topbar(title,back){return '<div class="top">'+(back?'<button class="iconbtn" data-act="back" aria-label="Назад">'+svg('back','#14171A')+'</button>':'')+'<h1>'+esc(title)+'</h1></div>';}
 
-function suggestHtml(){const n=norm(S.query);const m=n.length>=2?match(S.query):[];const keys=n.length>=2?m.slice(0,6):POPULAR.slice(0,8);
+function suggestHtml(){if(S.unknown&&norm(S.query)===norm(S.unknown))return '<div class="card" style="gap:6px"><strong>Профессии «'+esc(S.unknown)+'» пока нет в базе</strong><span class="hint" style="font-size:14px">Выберите самую похожую — или введите название иначе</span></div><div class="chips">'+POPULAR.map(k=>'<button class="chip" data-act="pick" data-arg="'+k+'">'+esc(O[k].name)+'</button>').join('')+'</div>';const n=norm(S.query);const m=n.length>=2?match(S.query):[];const keys=n.length>=2?m.slice(0,6):POPULAR.slice(0,8);
   const label=n.length>=2?(m.length>1?'Уточните — нашли несколько профессий:':(m.length===1?'Нашли:':'')):'Часто проверяют:';
   if(!keys.length)return'';return'<p class="hint">'+label+'</p><div class="chips">'+keys.map(k=>'<button class="chip" data-act="pick" data-arg="'+k+'">'+esc(O[k].name)+'</button>').join('')+'</div>';}
 
@@ -600,7 +601,7 @@ function runReveal(){
     if(k<1)requestAnimationFrame(step);else{clearInterval(tick);finish();}};
   requestAnimationFrame(step);
 }
-function doCalc(){if(norm(S.query).length<2){S.notFound=true;const nf0=document.getElementById('nf');if(nf0)nf0.hidden=false;return;}const m=match(S.query);if(m.length===1)return openResult(m[0]);if(m.length>1){const ex=m.find(k=>norm(O[k].name)===norm(S.query));if(ex)return openResult(ex);const n=norm(S.query);const sc=k=>Math.max(norm(O[k].name)===n?2000:0,...O[k].kw.map(w=>{const nw=norm(w);return nw===n?1000:(n.indexOf(nw)>=0?nw.length:0);}));const best=m.slice().sort((a,b)=>sc(b)-sc(a))[0];return openResult(best);}return openResult(makeCustom(S.query));
+function doCalc(){if(norm(S.query).length<2){S.notFound=true;const nf0=document.getElementById('nf');if(nf0)nf0.hidden=false;return;}const m=match(S.query);if(m.length===1)return openResult(m[0]);if(m.length>1){const ex=m.find(k=>norm(O[k].name)===norm(S.query));if(ex)return openResult(ex);const n=norm(S.query);const sc=k=>Math.max(norm(O[k].name)===n?2000:0,...O[k].kw.map(w=>{const nw=norm(w);return nw===n?1000:(n.indexOf(nw)>=0?nw.length:0);}));const best=m.slice().sort((a,b)=>sc(b)-sc(a))[0];return openResult(best);}const cu=makeCustom(S.query);if(cu)return openResult(cu);S.unknown=S.query.trim();track('not_found',{query:S.unknown});const sg0=document.getElementById('sugg');if(sg0)sg0.innerHTML=suggestHtml();return;
   const nf=document.getElementById('nf');if(nf)nf.hidden=!S.notFound;const sg=document.getElementById('sugg');if(sg)sg.innerHTML=suggestHtml();}
 
 function ensureBasics(){ if(!S.occ){S.occ='buh';} if(S.screen==='input'||S.screen==='result'){S.screen='hub';} if(!S.target){const r=risk(occ(),S.bump);S.target=(tierOf(r)==='low'&&!occ().special)?'stay':occ().targets[0].key;} if(!S.save.on) S.save.on=true; if(!S.agent.length) S.agent=agentSet(0); }
